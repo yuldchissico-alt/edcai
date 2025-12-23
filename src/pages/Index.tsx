@@ -384,7 +384,7 @@ const Index = () => {
   if (uiMode === "CHAT") {
     return (
       <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/60 text-foreground flex items-center justify-center px-4 py-6 md:py-10">
-        <section className="w-full max-w-5xl mx-auto flex gap-4 h-full max-h-[90vh]">
+        <section className="w-full max-w-5xl mx-auto flex justify-center h-full max-h-[90vh]">
           <ConversationsSidebar />
 
           <div className="flex-1 flex flex-col gap-5 animate-fade-in">
@@ -551,7 +551,7 @@ const Index = () => {
           </Button>
         </div>
 
-        <div className="w-full max-w-5xl mx-auto flex gap-6 items-start">
+        <div className="w-full max-w-5xl mx-auto flex justify-center items-start">
           <ConversationsSidebar />
 
           <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
