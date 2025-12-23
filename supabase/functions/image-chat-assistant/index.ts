@@ -147,6 +147,11 @@ serve(async (req) => {
         "Não tenho certeza se entendi. Pode explicar com um pouco mais de detalhe o tipo de imagem que você quer?";
     }
 
+    // Garante que SEMPRE haja o marcador de modo de interface
+    if (!assistantText.includes("[UI_MODE:CHAT]")) {
+      assistantText = `[UI_MODE:CHAT]\n\n${assistantText}`;
+    }
+
     return new Response(
       JSON.stringify({
         reply: assistantText,
