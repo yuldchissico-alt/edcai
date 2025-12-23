@@ -260,6 +260,48 @@ const Index = () => {
       if (data?.error) throw new Error(data.error);
       const imageUrl = data.image as string;
 
+      // Salvar automaticamente a imagem gerada na galeria "Minhas Fotos"
+      if (user && imageUrl.startsWith("data:image")) {
+        try {
+          const matches = imageUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+          if (matches) {
+            const mimeType = matches[1];
+            const base64Data = matches[2];
+
+            const byteChars = atob(base64Data);
+            const byteNumbers = new Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) {
+              byteNumbers[i] = byteChars.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: mimeType });
+
+            const extension = mimeType.split("/")[1] || "png";
+            const filePath = `${user.id}/${Date.now()}.${extension}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from("user-photos")
+              .upload(filePath, blob);
+
+            if (!uploadError) {
+              const { error: dbError } = await supabase.from("photos").insert({
+                user_id: user.id,
+                storage_path: filePath,
+                title: promptText.slice(0, 100) || null,
+              });
+
+              if (dbError) {
+                console.error("Erro ao salvar foto gerada em photos:", dbError);
+              }
+            } else {
+              console.error("Erro ao fazer upload da foto gerada:", uploadError);
+            }
+          }
+        } catch (uploadErr) {
+          console.error("Erro ao processar/upload da imagem gerada:", uploadErr);
+        }
+      }
+
       let convId = conversationId;
       if (!convId) {
         convId = await ensureConversation(promptText.slice(0, 80));
@@ -296,24 +338,6 @@ const Index = () => {
       setGeneratingImage(false);
     }
   };
-  const handleImageChat = async (initialPrompt?: string) => {
-    const messageContent = (initialPrompt ?? prompt).trim();
-    if (!messageContent) {
-      toast({
-        title: "Digite um prompt",
-        description: "Descreva a imagem que deseja gerar",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const conversationId = await ensureConversation(messageContent.slice(0, 80));
-    if (!conversationId) return;
-
-    const userMessage: ChatMessage = {
-      role: "user",
-      content: messageContent,
-    };
 
     const newMessages: ChatMessage[] = [...chatMessages, userMessage];
 
