@@ -219,7 +219,7 @@ const Index = () => {
   const handleGenerateImages = async () => {
     await handleImageChat();
   };
-  return <main className="min-h-screen bg-background text-foreground flex">
+  return <main className="min-h-screen bg-background text-foreground flex items-center justify-center">
       
 
       <section className="flex-1 flex flex-col px-4 py-6 md:py-10">
