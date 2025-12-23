@@ -42,7 +42,8 @@ interface VideoFrames {
 
 interface ChatMessage {
   role: "user" | "assistant";
-  content: string;
+  content?: string;
+  imageUrl?: string;
 }
 
 const Index = () => {
@@ -56,7 +57,6 @@ const Index = () => {
   const [videoFrames, setVideoFrames] = useState<VideoFrames | null>(null);
 
   const [imageAspect, setImageAspect] = useState("9:16");
-  const [imageResult, setImageResult] = useState<string | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
@@ -176,7 +176,16 @@ const Index = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      setImageResult(data.image as string);
+      const imageUrl = data.image as string;
+
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Imagem gerada 👇",
+          imageUrl,
+        },
+      ]);
     } catch (err) {
       console.error("Error generating image:", err);
       toast({
@@ -368,18 +377,45 @@ const Index = () => {
           {chatMessages.length > 0 && (
             <Card className="bg-muted/40 border-border/60 p-4 space-y-3">
               <h2 className="text-sm font-medium">Assistente de imagem</h2>
-              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+              <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
                 {chatMessages.map((msg, index) => (
                   <div
                     key={index}
-                    className={`rounded-lg px-3 py-2 text-sm border border-border/40 bg-background/60 ${
+                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${
                       msg.role === "user" ? "ml-auto" : "mr-auto"
                     }`}
                   >
                     <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
                       {msg.role === "user" ? "Você" : "IA"}
                     </span>
-                    <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    {msg.content && (
+                      <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    )}
+                    {msg.imageUrl && (
+                      <div className="space-y-2">
+                        <div className="overflow-hidden rounded-lg border bg-background">
+                          <img
+                            src={msg.imageUrl}
+                            alt="Imagem gerada pela IA"
+                            className="w-full h-auto object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => {
+                            const a = document.createElement("a");
+                            a.href = msg.imageUrl!;
+                            a.download = "imagem-gerada.png";
+                            a.click();
+                          }}
+                        >
+                          Baixar imagem
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -567,53 +603,6 @@ const Index = () => {
           )}
         </div>
       </section>
-
-      {imageResult && (
-        <section className="border-t border-border/40 bg-background/95 backdrop-blur-sm px-4 py-10">
-          <div className="max-w-5xl mx-auto space-y-8">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-primary" />
-                  Imagem gerada
-                </h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setImageResult(null)}
-                >
-                  Limpar imagem
-                </Button>
-              </div>
-
-              <Card className="p-6 border-2 border-secondary/30 bg-gradient-to-br from-background to-muted/40">
-                <div className="space-y-3">
-                  <div className="overflow-hidden rounded-lg border bg-background">
-                    <img
-                      src={imageResult}
-                      alt="Imagem gerada pela IA"
-                      className="w-full h-auto object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                      const a = document.createElement("a");
-                      a.href = imageResult;
-                      a.download = "imagem-gerada.png";
-                      a.click();
-                    }}
-                  >
-                    Baixar imagem
-                  </Button>
-                </div>
-              </Card>
-            </div>
-          </div>
-        </section>
-      )}
     </main>
   );
 };
