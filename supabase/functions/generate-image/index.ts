@@ -42,56 +42,102 @@ ${prompt}`;
       const styleHint =
         "Style: natural, lifestyle, user-generated content, candid moment, everyday context. Focus on realism and professional lighting.";
 
-      const response = await fetch(
-        "https://ai.gateway.lovable.dev/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
+      async function callOnce() {
+        const response = await fetch(
+          "https://ai.gateway.lovable.dev/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash-image-preview",
+              messages: [
+                {
+                  role: "user",
+                  content: `${basePrompt}\n\n${styleHint}`,
+                },
+              ],
+              modalities: ["image", "text"],
+            }),
           },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash-image-preview",
-            messages: [
-              {
-                role: "user",
-                content: `${basePrompt}\n\n${styleHint}`,
-              },
-            ],
-            modalities: ["image", "text"],
-          }),
-        },
-      );
+        );
 
-      if (!response.ok) {
-        if (response.status === 429) {
-          throw new Error(
-            "Limite de requisições excedido. Tente novamente em alguns instantes.",
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error(
+              "Limite de requisições excedido. Tente novamente em alguns instantes.",
+            );
+          }
+          if (response.status === 402) {
+            throw new Error(
+              "Créditos insuficientes. Adicione créditos em Settings → Workspace → Usage.",
+            );
+          }
+          const errorText = await response.text();
+          console.error(
+            "AI gateway error (generate-image):",
+            response.status,
+            errorText,
           );
+          throw new Error("Erro ao gerar imagem");
         }
-        if (response.status === 402) {
-          throw new Error(
-            "Créditos insuficientes. Adicione créditos em Settings → Workspace → Usage.",
-          );
-        }
-        const errorText = await response.text();
-        console.error("AI gateway error (generate-image):", response.status, errorText);
-        throw new Error("Erro ao gerar imagem");
+
+        const data = await response.json();
+        console.log("generate-image response:", data);
+
+        const message = data?.choices?.[0]?.message;
+        const imageEntry = message?.images?.[0]?.image_url;
+        const imageData =
+          typeof imageEntry === "string" ? imageEntry : imageEntry?.url;
+
+        return { imageData, message } as {
+          imageData?: string;
+          message?: { content?: unknown };
+        };
       }
 
-      const data = await response.json();
-      console.log("generate-image response:", data);
+      // Tentamos até 2 vezes, pois às vezes o modelo responde só com texto descritivo.
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        const { imageData, message } = await callOnce();
 
-      const imageEntry = data?.choices?.[0]?.message?.images?.[0]?.image_url;
-      const imageData =
-        typeof imageEntry === "string" ? imageEntry : imageEntry?.url;
+        if (imageData) {
+          return imageData;
+        }
 
-      if (!imageData) {
-        console.error("No image data in response (generate-image):", data);
-        throw new Error("Falha ao gerar imagem");
+        const rawContent = (() => {
+          const c: any = message?.content;
+          if (typeof c === "string") return c;
+          if (Array.isArray(c)) {
+            return c
+              .map((part) =>
+                typeof part === "string" ? part : part?.text ?? "",
+              )
+              .join("");
+          }
+          return "";
+        })();
+
+        console.error(
+          `No image data in response on attempt ${attempt} (generate-image):`,
+          { message, rawContent },
+        );
+
+        // Se na primeira tentativa veio só texto, reforçamos mensagem e tentamos de novo.
+        if (attempt === 1) {
+          continue;
+        }
+
+        throw new Error(
+          rawContent
+            ? `A IA não conseguiu gerar a imagem: ${rawContent}`
+            : "Falha ao gerar imagem",
+        );
       }
 
-      return imageData as string;
+      // Fallback de segurança, embora o laço sempre retorne ou lance erro.
+      throw new Error("Falha ao gerar imagem");
     }
 
     const image = await generateImage();
