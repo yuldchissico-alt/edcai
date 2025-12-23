@@ -42,6 +42,7 @@ const Index = () => {
   const [generatingImage, setGeneratingImage] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
+  const [hasConversation, setHasConversation] = useState(false);
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
@@ -179,11 +180,17 @@ const Index = () => {
       });
       return;
     }
-    const newMessages: ChatMessage[] = [...chatMessages, {
-      role: "user",
-      content: messageContent
-    }];
+
+    const newMessages: ChatMessage[] = [
+      ...chatMessages,
+      {
+        role: "user",
+        content: messageContent,
+      },
+    ];
+
     setChatMessages(newMessages);
+    setHasConversation(true);
     setChatLoading(true);
     try {
       const {
@@ -471,46 +478,121 @@ const Index = () => {
       <TabsContent value="chat" className="flex-1 mt-4">
           <div className="h-[70vh] flex flex-col gap-4">
             <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col flex-1">
-              <h2 className="text-sm font-medium">Assistente de imagem</h2>
-              <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-                {chatMessages.map((msg, index) => <div key={index} className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${msg.role === "user" ? "ml-auto" : "mr-auto"}`}>
-                    <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                      {msg.role === "user" ? "Você" : "IA"}
-                    </span>
-                    {msg.content && <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>}
-                    {msg.imageUrl && <div className="space-y-2">
-                        <div className="overflow-hidden rounded-lg border bg-background">
-                          <img src={msg.imageUrl} alt="Imagem gerada pela IA" className="w-full h-auto object-cover" loading="lazy" />
-                        </div>
-                        <Button variant="outline" size="sm" className="w-full" onClick={() => {
-                        const a = document.createElement("a");
-                        a.href = msg.imageUrl!;
-                        a.download = "imagem-gerada.png";
-                        a.click();
-                      }}>
-                          Baixar imagem
-                        </Button>
-                      </div>}
-                  </div>)}
-              </div>
-              {chatLoading && <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                  Pensando na melhor forma de gerar sua imagem...
-                </p>}
+              {hasConversation ? (
+                <>
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-sm font-medium">Assistente de imagem</h2>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setChatMessages([]);
+                        setHasConversation(false);
+                      }}
+                    >
+                      Nova conversa
+                    </Button>
+                  </div>
+                  <div className="space-y-3 flex-1 overflow-y-auto pr-1">
+                    {chatMessages.map((msg, index) => (
+                      <div
+                        key={index}
+                        className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${msg.role === "user" ? "ml-auto" : "mr-auto"}`}
+                      >
+                        <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                          {msg.role === "user" ? "Você" : "IA"}
+                        </span>
+                        {msg.content && (
+                          <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                        )}
+                        {msg.imageUrl && (
+                          <div className="space-y-2">
+                            <div className="overflow-hidden rounded-lg border bg-background">
+                              <img
+                                src={msg.imageUrl}
+                                alt="Imagem gerada pela IA"
+                                className="w-full h-auto object-cover"
+                                loading="lazy"
+                              />
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full"
+                              onClick={() => {
+                                const a = document.createElement("a");
+                                a.href = msg.imageUrl!;
+                                a.download = "imagem-gerada.png";
+                                a.click();
+                              }}
+                            >
+                              Baixar imagem
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {chatLoading && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Pensando na melhor forma de gerar sua imagem...
+                    </p>
+                  )}
+                </>
+              ) : (
+                <div className="flex flex-1 flex-col items-center justify-center text-center gap-3">
+                  <h2 className="text-lg md:text-xl font-semibold">Como posso te ajudar hoje?</h2>
+                  <p className="text-sm text-muted-foreground max-w-sm">
+                    Converse comigo como se estivesse falando com um especialista humano em criativos.
+                    Eu vou entender seu contexto e sugerir as melhores imagens.
+                  </p>
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p className="font-medium">Exemplos de uso:</p>
+                    <p>
+                      • "Quero uma imagem para anúncio de Instagram sobre aula de inglês online"
+                    </p>
+                    <p>
+                      • "Preciso de uma capa profissional para meu e-book de finanças pessoais"
+                    </p>
+                    <p>
+                      • "Crie uma imagem minimalista para anúncio de perfume de luxo"
+                    </p>
+                  </div>
+                </div>
+              )}
             </Card>
 
             <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
-              <form className="flex items-center gap-3" onSubmit={e => {
+              <form
+                className="flex items-center gap-3"
+                onSubmit={e => {
                   e.preventDefault();
                   handleImageChat();
-                }}>
+                }}
+              >
                 <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
                   <Plus className="w-4 h-4 text-muted-foreground" />
                 </div>
-                <Textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Descreva a imagem que quer gerar..." className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0" />
+                <Textarea
+                  value={prompt}
+                  onChange={e => setPrompt(e.target.value)}
+                  placeholder="Descreva a imagem que quer gerar..."
+                  className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
                 <div className="flex items-center gap-2 shrink-0">
-                  <Button type="submit" size="icon" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={chatLoading || generatingImage} aria-label="Enviar para IA de imagem">
-                    {chatLoading || generatingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+                  <Button
+                    type="submit"
+                    size="icon"
+                    className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                    disabled={chatLoading || generatingImage}
+                    aria-label="Enviar para IA de imagem"
+                  >
+                    {chatLoading || generatingImage ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <ImageIcon className="w-4 h-4" />
+                    )}
                   </Button>
                 </div>
               </form>
