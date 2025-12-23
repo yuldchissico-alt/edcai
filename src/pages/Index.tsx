@@ -313,6 +313,7 @@ const Index = () => {
               onSubmit={(e) => {
                 e.preventDefault();
                 handleImageChat();
+                setPrompt("");
               }}
             >
               <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
@@ -373,8 +374,8 @@ const Index = () => {
                     className="flex items-center gap-3"
                     onSubmit={(e) => {
                       e.preventDefault();
-                      e.preventDefault();
                       handleImageChat();
+                      setPrompt("");
                     }}
                   >
                     <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
