@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Sparkles, Copy, CheckCircle2 } from "lucide-react";
+import { Loader2, Sparkles, Copy, CheckCircle2, Video } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import VideoPlayer from "@/components/VideoPlayer";
 
 interface AdContent {
   hook: string;
@@ -20,10 +21,17 @@ interface AdContent {
   cta: string;
 }
 
+interface VideoFrames {
+  scene1: string;
+  scene2: string;
+  scene3: string;
+}
+
 const Index = () => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [generatingVideo, setGeneratingVideo] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   
   // Form data
@@ -36,6 +44,7 @@ const Index = () => {
   
   // Generated content
   const [adContent, setAdContent] = useState<AdContent | null>(null);
+  const [videoFrames, setVideoFrames] = useState<VideoFrames | null>(null);
 
   const handleGenerate = async () => {
     if (!productName || !targetAudience || !mainBenefit) {
@@ -84,6 +93,50 @@ const Index = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateVideo = async () => {
+    if (!adContent) return;
+
+    setGeneratingVideo(true);
+    try {
+      toast({
+        title: "Gerando vídeo...",
+        description: "Criando 3 cenas com IA. Isso pode levar até 30 segundos.",
+      });
+
+      const { data, error } = await supabase.functions.invoke("generate-video-frames", {
+        body: {
+          script: adContent.script,
+          niche,
+          platform
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setVideoFrames(data.frames);
+      
+      toast({
+        title: "Vídeo gerado! 🎬",
+        description: "Suas 3 cenas estão prontas",
+      });
+    } catch (error) {
+      console.error("Error generating video:", error);
+      toast({
+        title: "Erro ao gerar vídeo",
+        description: error instanceof Error ? error.message : "Tente novamente em alguns instantes",
+        variant: "destructive"
+      });
+    } finally {
+      setGeneratingVideo(false);
     }
   };
 
@@ -254,6 +307,7 @@ const Index = () => {
           onClick={() => {
             setStep(2);
             setAdContent(null);
+            setVideoFrames(null);
           }}
         >
           ← Gerar outro anúncio
@@ -266,6 +320,50 @@ const Index = () => {
       </div>
 
       <div className="grid gap-6">
+        {/* Video Player */}
+        {!videoFrames && !generatingVideo && (
+          <Card className="p-6 border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10">
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent mb-2">
+                <Video className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg mb-2">Gerar Vídeo do Anúncio</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Transforme seu roteiro em 3 cenas visuais geradas com IA
+                </p>
+              </div>
+              <Button
+                onClick={handleGenerateVideo}
+                disabled={generatingVideo}
+                size="lg"
+                className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
+              >
+                <Video className="mr-2 h-5 w-5" />
+                Gerar Vídeo com IA
+              </Button>
+            </div>
+          </Card>
+        )}
+
+        {generatingVideo && (
+          <Card className="p-8 border-2 border-primary/20">
+            <div className="text-center space-y-4">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+              <div>
+                <h3 className="font-bold text-lg">Gerando suas cenas...</h3>
+                <p className="text-sm text-muted-foreground mt-2">
+                  A IA está criando 3 cenas visuais únicas para seu anúncio.<br />
+                  Isso pode levar até 30 segundos.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {videoFrames && (
+          <VideoPlayer frames={videoFrames} script={adContent.script} />
+        )}
         {/* Hook */}
         <Card className="p-6 border-2 border-primary/20">
           <div className="flex items-start justify-between mb-3">
