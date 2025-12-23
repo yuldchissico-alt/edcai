@@ -259,9 +259,28 @@ const Index = () => {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col">
-      <section className="flex-1 flex flex-col items-center justify-center px-4 py-6 md:py-10">
-        <div className="w-full max-w-5xl flex flex-col gap-6">
+    <main className="min-h-screen bg-background text-foreground flex">
+      <aside className="hidden md:flex w-64 flex-col border-r border-border bg-muted/10 px-4 py-6 gap-3">
+        <div className="mb-4">
+          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Menu</p>
+          <p className="text-sm font-semibold mt-1">Estúdio IA</p>
+        </div>
+        <Button variant="outline" className="justify-start rounded-full text-sm">
+          Novo chat
+        </Button>
+        <Button variant="ghost" className="justify-start text-sm text-muted-foreground">
+          Dashboard
+        </Button>
+        <Button variant="ghost" className="justify-start text-sm text-muted-foreground">
+          Chat de imagens
+        </Button>
+        <div className="mt-auto pt-4 border-t border-border/60 text-xs text-muted-foreground">
+          <p>Sessões recentes em breve</p>
+        </div>
+      </aside>
+
+      <section className="flex-1 flex flex-col px-4 py-6 md:py-10">
+        <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2 text-center">
             <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
               Estúdio de Criativos com IA
