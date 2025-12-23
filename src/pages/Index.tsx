@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic, LogOut } from "lucide-react";
+import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic, LogOut, Images } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -276,9 +276,14 @@ const Index = () => {
               </p>
               <h1 className="text-lg md:text-xl font-semibold mt-1">Chat de imagens</h1>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">
-              <LogOut className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/gallery")} title="Minhas Fotos">
+                <Images className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
           </header>
 
           <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col flex-1 min-h-0">
@@ -399,6 +404,15 @@ const Index = () => {
             </p>
             <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
           </div>
+
+          <Button 
+            variant="outline" 
+            onClick={() => navigate("/gallery")}
+            className="flex items-center gap-2"
+          >
+            <Images className="w-4 h-4" />
+            Minhas Fotos
+          </Button>
 
           <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
             <TabsList className="w-full max-w-xs mx-auto">
