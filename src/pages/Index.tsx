@@ -381,23 +381,23 @@ const Index = () => {
   }
 
   return <main className="min-h-screen bg-background text-foreground flex items-center justify-center">
-      <section className="flex-1 flex flex-col px-4 py-6 md:py-10">
+      <section className="flex-1 flex flex-col px-4 py-6 md:py-10 relative">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleLogout} 
+          className="absolute top-4 right-4"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Sair
+        </Button>
+        
         <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 items-center">
           <div className="flex flex-col items-center gap-2 text-center">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex-1" />
-              <div className="flex-1 flex flex-col items-center">
-                <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
-                  Estúdio de Criativos com IA
-                </p>
-                <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
-              </div>
-              <div className="flex-1 flex justify-end">
-                <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">
-                  <LogOut className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
+            <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
+              Estúdio de Criativos com IA
+            </p>
+            <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
           </div>
 
           <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
