@@ -323,8 +323,8 @@ const Index = () => {
                   </form>
                 </Card>
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-muted-foreground">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-4 text-xs md:text-sm text-muted-foreground text-center md:text-left">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               <span className="font-medium text-foreground/80">Ações rápidas:</span>
               <button
                 type="button"
@@ -344,7 +344,7 @@ const Index = () => {
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center md:justify-start gap-2">
               <span>Formato da imagem:</span>
               <Select value={imageAspect} onValueChange={setImageAspect}>
                 <SelectTrigger className="h-8 w-32 text-xs">
