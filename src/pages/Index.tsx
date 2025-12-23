@@ -2,28 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Loader2,
-  Sparkles,
-  Copy,
-  CheckCircle2,
-  Video,
-  Image as ImageIcon,
-  Plus,
-  Mic,
-} from "lucide-react";
+import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import VideoPlayer from "@/components/VideoPlayer";
-
 interface AdContent {
   hook: string;
   script: {
@@ -34,210 +18,190 @@ interface AdContent {
   caption: string;
   cta: string;
 }
-
 interface VideoFrames {
   scene1: string;
   scene2: string;
   scene3: string;
 }
-
 interface ChatMessage {
   role: "user" | "assistant";
   content?: string;
   imageUrl?: string;
 }
-
 const Index = () => {
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [prompt, setPrompt] = useState("");
   const [loadingAd, setLoadingAd] = useState(false);
   const [generatingVideo, setGeneratingVideo] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-
   const [adContent, setAdContent] = useState<AdContent | null>(null);
   const [videoFrames, setVideoFrames] = useState<VideoFrames | null>(null);
-
   const [imageAspect, setImageAspect] = useState("9:16");
   const [generatingImage, setGeneratingImage] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
-
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
     toast({
       title: "Copiado!",
-      description: "Texto copiado para a área de transferência",
+      description: "Texto copiado para a área de transferência"
     });
   };
-
   const handleGenerateAd = async () => {
     if (!prompt.trim()) {
       toast({
         title: "Digite um prompt",
         description: "Descreva o anúncio que deseja gerar",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setLoadingAd(true);
     setAdContent(null);
     setVideoFrames(null);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-ad", {
-        body: { prompt },
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke("generate-ad", {
+        body: {
+          prompt
+        }
       });
-
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
       setAdContent(data as AdContent);
       toast({
         title: "Anúncio gerado!",
-        description: "Seu anúncio está pronto para usar.",
+        description: "Seu anúncio está pronto para usar."
       });
     } catch (error) {
       console.error("Error generating ad:", error);
       toast({
         title: "Erro ao gerar anúncio",
-        description:
-          error instanceof Error ? error.message : "Tente novamente em alguns instantes",
-        variant: "destructive",
+        description: error instanceof Error ? error.message : "Tente novamente em alguns instantes",
+        variant: "destructive"
       });
     } finally {
       setLoadingAd(false);
     }
   };
-
   const handleGenerateVideo = async () => {
     if (!adContent) return;
-
     setGeneratingVideo(true);
     try {
       toast({
         title: "Gerando vídeo...",
-        description: "Criando 3 cenas com IA. Isso pode levar até 30 segundos.",
+        description: "Criando 3 cenas com IA. Isso pode levar até 30 segundos."
       });
-
-      const { data, error } = await supabase.functions.invoke("generate-video-frames", {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke("generate-video-frames", {
         body: {
           script: adContent.script,
           niche: "geral",
-          platform: "meta",
-        },
+          platform: "meta"
+        }
       });
-
       if (error) throw error;
       if (data.error) throw new Error(data.error);
-
       setVideoFrames(data.frames as VideoFrames);
       toast({
         title: "Vídeo gerado! 🎬",
-        description: "Suas 3 cenas estão prontas.",
+        description: "Suas 3 cenas estão prontas."
       });
     } catch (error) {
       console.error("Error generating video:", error);
       toast({
         title: "Erro ao gerar vídeo",
-        description:
-          error instanceof Error ? error.message : "Tente novamente em alguns instantes",
-        variant: "destructive",
+        description: error instanceof Error ? error.message : "Tente novamente em alguns instantes",
+        variant: "destructive"
       });
     } finally {
       setGeneratingVideo(false);
     }
   };
-
   const generateImagesFromPrompt = async (promptText: string) => {
     if (!promptText.trim()) {
       toast({
         title: "Digite um prompt",
         description: "Descreva a imagem que deseja gerar",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     try {
       setGeneratingImage(true);
       toast({
         title: "Gerando imagem...",
-        description: "Criando uma imagem ultra-realista para o seu prompt.",
+        description: "Criando uma imagem ultra-realista para o seu prompt."
       });
-
-      const { data, error } = await supabase.functions.invoke("generate-image", {
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke("generate-image", {
         body: {
           prompt: promptText,
-          aspectRatio: imageAspect,
-        },
+          aspectRatio: imageAspect
+        }
       });
-
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
       const imageUrl = data.image as string;
-
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Imagem gerada 👇",
-          imageUrl,
-        },
-      ]);
+      setChatMessages(prev => [...prev, {
+        role: "assistant",
+        content: "Imagem gerada 👇",
+        imageUrl
+      }]);
     } catch (err) {
       console.error("Error generating image:", err);
       toast({
         title: "Erro ao gerar imagens",
-        description:
-          err instanceof Error ? err.message : "Tente novamente em alguns instantes.",
-        variant: "destructive",
+        description: err instanceof Error ? err.message : "Tente novamente em alguns instantes.",
+        variant: "destructive"
       });
     } finally {
       setGeneratingImage(false);
     }
   };
-
   const handleImageChat = async (initialPrompt?: string) => {
     const messageContent = (initialPrompt ?? prompt).trim();
-
     if (!messageContent) {
       toast({
         title: "Digite um prompt",
         description: "Descreva a imagem que deseja gerar",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
-    const newMessages: ChatMessage[] = [
-      ...chatMessages,
-      { role: "user", content: messageContent },
-    ];
-
+    const newMessages: ChatMessage[] = [...chatMessages, {
+      role: "user",
+      content: messageContent
+    }];
     setChatMessages(newMessages);
     setChatLoading(true);
-
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "image-chat-assistant",
-        {
-          body: { messages: newMessages },
-        },
-      );
-
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke("image-chat-assistant", {
+        body: {
+          messages: newMessages
+        }
+      });
       if (error) throw error;
       if (data?.error) throw new Error(data.error as string);
-
       if (data?.reply) {
-        setChatMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: data.reply as string },
-        ]);
+        setChatMessages(prev => [...prev, {
+          role: "assistant",
+          content: data.reply as string
+        }]);
       }
-
       if (data?.ready && data.finalPrompt) {
         await generateImagesFromPrompt(data.finalPrompt as string);
       }
@@ -245,39 +209,18 @@ const Index = () => {
       console.error("Error in image chat:", err);
       toast({
         title: "Erro ao conversar com a IA de imagem",
-        description:
-          err instanceof Error ? err.message : "Tente novamente em alguns instantes.",
-        variant: "destructive",
+        description: err instanceof Error ? err.message : "Tente novamente em alguns instantes.",
+        variant: "destructive"
       });
     } finally {
       setChatLoading(false);
     }
   };
-
   const handleGenerateImages = async () => {
     await handleImageChat();
   };
-
-  return (
-    <main className="min-h-screen bg-background text-foreground flex">
-      <aside className="hidden md:flex w-64 flex-col border-r border-border bg-muted/10 px-4 py-6 gap-3">
-        <div className="mb-4">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Menu</p>
-          <p className="text-sm font-semibold mt-1">Estúdio IA</p>
-        </div>
-        <Button variant="outline" className="justify-start rounded-full text-sm">
-          Novo chat
-        </Button>
-        <Button variant="ghost" className="justify-start text-sm text-muted-foreground">
-          Dashboard
-        </Button>
-        <Button variant="ghost" className="justify-start text-sm text-muted-foreground">
-          Chat de imagens
-        </Button>
-        <div className="mt-auto pt-4 border-t border-border/60 text-xs text-muted-foreground">
-          <p>Sessões recentes em breve</p>
-        </div>
-      </aside>
+  return <main className="min-h-screen bg-background text-foreground flex">
+      
 
       <section className="flex-1 flex flex-col px-4 py-6 md:py-10">
         <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
@@ -301,42 +244,20 @@ const Index = () => {
             <TabsContent value="dashboard" className="flex-1">
               <div className="w-full max-w-3xl space-y-8 mt-4">
                 <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
-                  <form
-                    className="flex items-center gap-3"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleImageChat();
-                    }}
-                  >
+                  <form className="flex items-center gap-3" onSubmit={e => {
+                  e.preventDefault();
+                  handleImageChat();
+                }}>
                     <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
                       <Plus className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <Textarea
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
-                      className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-                    />
+                    <Textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..." className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0" />
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        className="rounded-full w-8 h-8 flex items-center justify-center bg-background/40 text-muted-foreground"
-                        aria-label="Microfone (em breve)"
-                      >
+                      <button type="button" className="rounded-full w-8 h-8 flex items-center justify-center bg-background/40 text-muted-foreground" aria-label="Microfone (em breve)">
                         <Mic className="w-4 h-4" />
                       </button>
-                      <Button
-                        type="submit"
-                        size="icon"
-                        className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-                        disabled={loadingAd}
-                        aria-label="Gerar anúncio"
-                      >
-                        {loadingAd ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Sparkles className="w-4 h-4" />
-                        )}
+                      <Button type="submit" size="icon" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={loadingAd} aria-label="Gerar anúncio">
+                        {loadingAd ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                       </Button>
                     </div>
                   </form>
@@ -345,20 +266,10 @@ const Index = () => {
           <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-4 text-xs md:text-sm text-muted-foreground text-center md:text-left">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               <span className="font-medium text-foreground/80">Ações rápidas:</span>
-              <button
-                type="button"
-                className="px-3 py-1 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors"
-                onClick={handleGenerateAd}
-                disabled={loadingAd}
-              >
+              <button type="button" className="px-3 py-1 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors" onClick={handleGenerateAd} disabled={loadingAd}>
                 Gerar anúncio
               </button>
-              <button
-                type="button"
-                className="px-3 py-1 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors"
-                onClick={handleGenerateImages}
-                disabled={generatingImage || chatLoading}
-              >
+              <button type="button" className="px-3 py-1 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors" onClick={handleGenerateImages} disabled={generatingImage || chatLoading}>
                 Gerar imagens
               </button>
             </div>
@@ -381,105 +292,58 @@ const Index = () => {
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">Exemplos de prompts de imagem:</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm">
-              {[
-                "Crie a foto de uma mulher mocambicana, 30 anos, cabelo natural preto, sorrindo confiante, em um escritório moderno, iluminação natural, estilo realista, pronta para anúncio em redes sociais.",
-                "Foto de um homem jovem empreendedor, sentado em frente ao notebook em um coworking moderno, estilo lifestyle, luz suave, focado em negócios digitais.",
-                "Imagem de produto cosmético minimalista apoiado em superfície de pedra, fundo desfocado, luz lateral dramática, estilo editorial premium.",
-                "Foto de casal se exercitando ao ar livre ao pôr do sol, clima de conquista e bem-estar, cores quentes, estilo campanha fitness profissional.",
-              ].map((example) => (
-                <button
-                  key={example}
-                  type="button"
-                  onClick={() => {
+              {["Crie a foto de uma mulher mocambicana, 30 anos, cabelo natural preto, sorrindo confiante, em um escritório moderno, iluminação natural, estilo realista, pronta para anúncio em redes sociais.", "Foto de um homem jovem empreendedor, sentado em frente ao notebook em um coworking moderno, estilo lifestyle, luz suave, focado em negócios digitais.", "Imagem de produto cosmético minimalista apoiado em superfície de pedra, fundo desfocado, luz lateral dramática, estilo editorial premium.", "Foto de casal se exercitando ao ar livre ao pôr do sol, clima de conquista e bem-estar, cores quentes, estilo campanha fitness profissional."].map(example => <button key={example} type="button" onClick={() => {
                     setPrompt(example);
                     generateImagesFromPrompt(example);
-                  }}
-                  className="text-left px-3 py-2 rounded-lg bg-muted/60 hover:bg-muted transition-colors border border-border/40"
-                >
+                  }} className="text-left px-3 py-2 rounded-lg bg-muted/60 hover:bg-muted transition-colors border border-border/40">
                   {example}
-                </button>
-              ))}
+                </button>)}
             </div>
           </div>
 
-          {chatMessages.length > 0 && (
-            <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col h-[60vh]">
+          {chatMessages.length > 0 && <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col h-[60vh]">
               <h2 className="text-sm font-medium">Assistente de imagem</h2>
               <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-                {chatMessages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${
-                      msg.role === "user" ? "ml-auto" : "mr-auto"
-                    }`}
-                  >
+                {chatMessages.map((msg, index) => <div key={index} className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${msg.role === "user" ? "ml-auto" : "mr-auto"}`}>
                     <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
                       {msg.role === "user" ? "Você" : "IA"}
                     </span>
-                    {msg.content && (
-                      <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                    )}
-                    {msg.imageUrl && (
-                      <div className="space-y-2">
+                    {msg.content && <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>}
+                    {msg.imageUrl && <div className="space-y-2">
                         <div className="overflow-hidden rounded-lg border bg-background">
-                          <img
-                            src={msg.imageUrl}
-                            alt="Imagem gerada pela IA"
-                            className="w-full h-auto object-cover"
-                            loading="lazy"
-                          />
+                          <img src={msg.imageUrl} alt="Imagem gerada pela IA" className="w-full h-auto object-cover" loading="lazy" />
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            const a = document.createElement("a");
-                            a.href = msg.imageUrl!;
-                            a.download = "imagem-gerada.png";
-                            a.click();
-                          }}
-                        >
+                        <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                        const a = document.createElement("a");
+                        a.href = msg.imageUrl!;
+                        a.download = "imagem-gerada.png";
+                        a.click();
+                      }}>
                           Baixar imagem
                         </Button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      </div>}
+                  </div>)}
               </div>
-              {chatLoading && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
+              {chatLoading && <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Pensando na melhor forma de gerar sua imagem...
-                </p>
-              )}
-            </Card>
-          )}
+                </p>}
+            </Card>}
 
-          {adContent && (
-            <section className="space-y-6">
+          {adContent && <section className="space-y-6">
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
                   Roteiro gerado
                 </h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGenerateVideo}
-                  disabled={generatingVideo}
-                >
-                  {generatingVideo ? (
-                    <>
+                <Button variant="outline" size="sm" onClick={handleGenerateVideo} disabled={generatingVideo}>
+                  {generatingVideo ? <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Gerando cenas...
-                    </>
-                  ) : (
-                    <>
+                    </> : <>
                       <Video className="w-4 h-4 mr-2" />
                       Gerar vídeo com 3 cenas
-                    </>
-                  )}
+                    </>}
                 </Button>
               </div>
 
@@ -493,20 +357,12 @@ const Index = () => {
                       Abertura do anúncio
                     </h3>
                     <p className="text-sm leading-relaxed">{adContent.hook}</p>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={() => copyToClipboard(adContent.hook, "hook")}
-                    >
-                      {copiedField === "hook" ? (
-                        <>
+                    <button type="button" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground" onClick={() => copyToClipboard(adContent.hook, "hook")}>
+                      {copiedField === "hook" ? <>
                           <CheckCircle2 className="w-3 h-3" /> Copiado
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <Copy className="w-3 h-3" /> Copiar
-                        </>
-                      )}
+                        </>}
                     </button>
                   </div>
 
@@ -537,25 +393,12 @@ const Index = () => {
                         <p className="leading-relaxed">{adContent.script.scene3}</p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={() =>
-                        copyToClipboard(
-                          `${adContent.script.scene1}\n\n${adContent.script.scene2}\n\n${adContent.script.scene3}`,
-                          "script",
-                        )
-                      }
-                    >
-                      {copiedField === "script" ? (
-                        <>
+                    <button type="button" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground" onClick={() => copyToClipboard(`${adContent.script.scene1}\n\n${adContent.script.scene2}\n\n${adContent.script.scene3}`, "script")}>
+                      {copiedField === "script" ? <>
                           <CheckCircle2 className="w-3 h-3" /> Script copiado
-                        </>
-                      ) : (
-                        <>
+                        </> : <>
                           <Copy className="w-3 h-3" /> Copiar script completo
-                        </>
-                      )}
+                        </>}
                     </button>
                   </div>
 
@@ -570,20 +413,12 @@ const Index = () => {
                       <p className="text-sm leading-relaxed whitespace-pre-line">
                         {adContent.caption}
                       </p>
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                        onClick={() => copyToClipboard(adContent.caption, "caption")}
-                      >
-                        {copiedField === "caption" ? (
-                          <>
+                      <button type="button" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground" onClick={() => copyToClipboard(adContent.caption, "caption")}>
+                        {copiedField === "caption" ? <>
                             <CheckCircle2 className="w-3 h-3" /> Copiado
-                          </>
-                        ) : (
-                          <>
+                          </> : <>
                             <Copy className="w-3 h-3" /> Copiar legenda
-                          </>
-                        )}
+                          </>}
                       </button>
                     </div>
 
@@ -595,30 +430,20 @@ const Index = () => {
                         Chamada para ação
                       </h3>
                       <p className="text-sm leading-relaxed">{adContent.cta}</p>
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                        onClick={() => copyToClipboard(adContent.cta, "cta")}
-                      >
-                        {copiedField === "cta" ? (
-                          <>
+                      <button type="button" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground" onClick={() => copyToClipboard(adContent.cta, "cta")}>
+                        {copiedField === "cta" ? <>
                             <CheckCircle2 className="w-3 h-3" /> Copiado
-                          </>
-                        ) : (
-                          <>
+                          </> : <>
                             <Copy className="w-3 h-3" /> Copiar CTA
-                          </>
-                        )}
+                          </>}
                       </button>
                     </div>
                   </div>
                 </div>
               </Card>
-            </section>
-          )}
+            </section>}
 
-          {videoFrames && adContent && (
-            <section className="space-y-6">
+          {videoFrames && adContent && <section className="space-y-6">
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <Video className="w-5 h-5 text-primary" />
@@ -627,8 +452,7 @@ const Index = () => {
               </div>
 
               <VideoPlayer frames={videoFrames} script={adContent.script} />
-            </section>
-          )}
+            </section>}
 
         </div>
       </TabsContent>
@@ -638,85 +462,44 @@ const Index = () => {
             <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col flex-1">
               <h2 className="text-sm font-medium">Assistente de imagem</h2>
               <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-                {chatMessages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${
-                      msg.role === "user" ? "ml-auto" : "mr-auto"
-                    }`}
-                  >
+                {chatMessages.map((msg, index) => <div key={index} className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${msg.role === "user" ? "ml-auto" : "mr-auto"}`}>
                     <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
                       {msg.role === "user" ? "Você" : "IA"}
                     </span>
-                    {msg.content && (
-                      <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                    )}
-                    {msg.imageUrl && (
-                      <div className="space-y-2">
+                    {msg.content && <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>}
+                    {msg.imageUrl && <div className="space-y-2">
                         <div className="overflow-hidden rounded-lg border bg-background">
-                          <img
-                            src={msg.imageUrl}
-                            alt="Imagem gerada pela IA"
-                            className="w-full h-auto object-cover"
-                            loading="lazy"
-                          />
+                          <img src={msg.imageUrl} alt="Imagem gerada pela IA" className="w-full h-auto object-cover" loading="lazy" />
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            const a = document.createElement("a");
-                            a.href = msg.imageUrl!;
-                            a.download = "imagem-gerada.png";
-                            a.click();
-                          }}
-                        >
+                        <Button variant="outline" size="sm" className="w-full" onClick={() => {
+                        const a = document.createElement("a");
+                        a.href = msg.imageUrl!;
+                        a.download = "imagem-gerada.png";
+                        a.click();
+                      }}>
                           Baixar imagem
                         </Button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      </div>}
+                  </div>)}
               </div>
-              {chatLoading && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
+              {chatLoading && <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Loader2 className="w-3 h-3 animate-spin" />
                   Pensando na melhor forma de gerar sua imagem...
-                </p>
-              )}
+                </p>}
             </Card>
 
             <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
-              <form
-                className="flex items-center gap-3"
-                onSubmit={(e) => {
+              <form className="flex items-center gap-3" onSubmit={e => {
                   e.preventDefault();
                   handleImageChat();
-                }}
-              >
+                }}>
                 <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
                   <Plus className="w-4 h-4 text-muted-foreground" />
                 </div>
-                <Textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Descreva a imagem que quer gerar..."
-                  className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-                />
+                <Textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Descreva a imagem que quer gerar..." className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0" />
                 <div className="flex items-center gap-2 shrink-0">
-                  <Button
-                    type="submit"
-                    size="icon"
-                    className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-                    disabled={chatLoading || generatingImage}
-                    aria-label="Enviar para IA de imagem"
-                  >
-                    {chatLoading || generatingImage ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <ImageIcon className="w-4 h-4" />
-                    )}
+                  <Button type="submit" size="icon" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90" disabled={chatLoading || generatingImage} aria-label="Enviar para IA de imagem">
+                    {chatLoading || generatingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
                   </Button>
                 </div>
               </form>
@@ -726,8 +509,6 @@ const Index = () => {
       </Tabs>
     </div>
   </section>
-</main>
-  );
+  </main>;
 };
-
 export default Index;
