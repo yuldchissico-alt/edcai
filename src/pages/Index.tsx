@@ -51,10 +51,7 @@ const Index = () => {
   const [videoFrames, setVideoFrames] = useState<VideoFrames | null>(null);
 
   const [imageAspect, setImageAspect] = useState("9:16");
-  const [imageResult, setImageResult] = useState<{
-    natural: string;
-    corporate: string;
-  } | null>(null);
+  const [imageResult, setImageResult] = useState<string | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
 
   const copyToClipboard = (text: string, field: string) => {
@@ -158,8 +155,8 @@ const Index = () => {
     try {
       setGeneratingImage(true);
       toast({
-        title: "Gerando imagens...",
-        description: "Criando versões natural e profissional para o seu prompt.",
+        title: "Gerando imagem...",
+        description: "Criando uma imagem ultra-realista para o seu prompt.",
       });
 
       const { data, error } = await supabase.functions.invoke("generate-image", {
@@ -172,10 +169,10 @@ const Index = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      setImageResult(data.images);
+      setImageResult(data.image as string);
       toast({
-        title: "Imagens geradas!",
-        description: "Duas versões prontas para uso profissional.",
+        title: "Imagem gerada!",
+        description: "Criativo pronto para uso profissional.",
       });
     } catch (err) {
       console.error("Error generating image:", err);
@@ -314,66 +311,39 @@ const Index = () => {
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                   <ImageIcon className="w-5 h-5 text-primary" />
-                  Imagens geradas
+                  Imagem gerada
                 </h2>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setImageResult(null)}
                 >
-                  Limpar imagens
+                  Limpar imagem
                 </Button>
               </div>
 
               <Card className="p-6 border-2 border-secondary/30 bg-gradient-to-br from-background to-muted/40">
-                <div className="grid gap-4 md:grid-cols-2 mt-2">
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-sm">Versão Natural (UGC)</h4>
-                    <div className="overflow-hidden rounded-lg border bg-background">
-                      <img
-                        src={imageResult.natural}
-                        alt="Imagem gerada - estilo natural UGC"
-                        className="w-full h-auto object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        const a = document.createElement("a");
-                        a.href = imageResult.natural;
-                        a.download = "imagem-natural.png";
-                        a.click();
-                      }}
-                    >
-                      Baixar versão natural
-                    </Button>
+                <div className="space-y-3">
+                  <div className="overflow-hidden rounded-lg border bg-background">
+                    <img
+                      src={imageResult}
+                      alt="Imagem gerada pela IA"
+                      className="w-full h-auto object-cover"
+                      loading="lazy"
+                    />
                   </div>
-
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-sm">Versão Profissional / Corporativa</h4>
-                    <div className="overflow-hidden rounded-lg border bg-background">
-                      <img
-                        src={imageResult.corporate}
-                        alt="Imagem gerada - estilo profissional corporativo"
-                        className="w-full h-auto object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        const a = document.createElement("a");
-                        a.href = imageResult.corporate;
-                        a.download = "imagem-profissional.png";
-                        a.click();
-                      }}
-                    >
-                      Baixar versão profissional
-                    </Button>
-                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      const a = document.createElement("a");
+                      a.href = imageResult;
+                      a.download = "imagem-gerada.png";
+                      a.click();
+                    }}
+                  >
+                    Baixar imagem
+                  </Button>
                 </div>
               </Card>
             </div>
