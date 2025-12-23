@@ -590,10 +590,11 @@ const Index = () => {
         <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
           <Button
             variant="outline"
+            size="sm"
             onClick={() => navigate("/gallery")}
-            className="flex items-center gap-2 rounded-full px-3 py-1 text-xs md:text-sm bg-background/80 backdrop-blur-sm border-border/60"
+            className="flex items-center gap-2 rounded-full px-2 py-0.5 text-xs md:text-sm bg-background/80 backdrop-blur-sm border-border/60"
           >
-            <Images className="w-4 h-4" />
+            <Images className="w-3 h-3" />
             Minhas Fotos
           </Button>
           <Button
