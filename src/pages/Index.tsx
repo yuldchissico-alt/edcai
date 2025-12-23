@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic } from "lucide-react";
+import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic, LogOut } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 import VideoPlayer from "@/components/VideoPlayer";
 interface AdContent {
   hook: string;
@@ -29,6 +31,8 @@ interface ChatMessage {
   imageUrl?: string;
 }
 const Index = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
   const {
     toast
   } = useToast();
@@ -43,6 +47,32 @@ const Index = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [uiMode, setUiMode] = useState<"DASHBOARD" | "CHAT">("DASHBOARD");
+
+  useEffect(() => {
+    // Verifica se está autenticado
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate("/auth");
+      } else {
+        setUser(session.user);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate("/auth");
+      } else {
+        setUser(session.user);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
     setCopiedField(field);
@@ -246,6 +276,9 @@ const Index = () => {
               </p>
               <h1 className="text-lg md:text-xl font-semibold mt-1">Chat de imagens</h1>
             </div>
+            <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">
+              <LogOut className="w-4 h-4" />
+            </Button>
           </header>
 
           <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col flex-1 min-h-0">
@@ -351,10 +384,20 @@ const Index = () => {
       <section className="flex-1 flex flex-col px-4 py-6 md:py-10">
         <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 items-center">
           <div className="flex flex-col items-center gap-2 text-center">
-            <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
-              Estúdio de Criativos com IA
-            </p>
-            <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
+            <div className="flex items-center justify-between w-full">
+              <div className="flex-1" />
+              <div className="flex-1 flex flex-col items-center">
+                <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                  Estúdio de Criativos com IA
+                </p>
+                <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
+              </div>
+              <div className="flex-1 flex justify-end">
+                <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">
+                  <LogOut className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
           </div>
 
           <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
