@@ -598,21 +598,22 @@ const Index = () => {
             Minhas Fotos
           </Button>
           <Button
-            variant="outline"
+            variant="ghost"
+            size="icon"
             onClick={() => navigate("/settings")}
-            className="flex items-center gap-2 rounded-full px-3 py-1 text-xs md:text-sm bg-background/80 backdrop-blur-sm border-border/60"
+            className="rounded-full text-xs md:text-sm text-muted-foreground hover:text-foreground"
+            title="Configurações"
           >
             <Clock className="w-4 h-4" />
-            Configurações
           </Button>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={handleLogout}
-            className="rounded-full text-xs md:text-sm"
+            className="rounded-full text-xs md:text-sm text-muted-foreground hover:text-destructive"
+            title="Sair"
           >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
+            <LogOut className="w-4 h-4" />
           </Button>
         </div>
 
