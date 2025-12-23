@@ -115,6 +115,11 @@ const Index = () => {
   );
 
   const handleSelectConversation = (conversationId: string) => {
+    if (currentConversationId === conversationId) {
+      setCurrentConversationId(null);
+      setChatMessages([]);
+      return;
+    }
     loadConversationMessages(conversationId);
   };
 
