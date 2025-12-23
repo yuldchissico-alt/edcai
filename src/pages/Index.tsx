@@ -262,13 +262,11 @@ const Index = () => {
     <main className="min-h-screen bg-background text-foreground flex flex-col">
       <section className="flex-1 flex flex-col items-center px-4 py-6 md:py-10">
         <div className="w-full max-w-5xl flex flex-col gap-6">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="space-y-1">
-              <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
-                Estúdio de Criativos com IA
-              </p>
-              <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
-            </div>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
+              Estúdio de Criativos com IA
+            </p>
+            <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
           </div>
 
           <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
