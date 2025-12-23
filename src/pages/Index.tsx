@@ -379,73 +379,7 @@ const Index = () => {
     await handleImageChat();
   };
 
-  const ConversationsSidebar = () => (
-    <aside className="hidden md:flex w-64 flex-col gap-3 border-r border-border/40 pr-3">
-      <button
-        type="button"
-        className="flex items-center justify-between gap-2 text-left w-full group"
-        onClick={() => setIsConversationsOpen((prev) => !prev)}
-      >
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Conversas antigas
-        </span>
-        <div className="flex items-center gap-1">
-          <Button
-            size="icon"
-            variant="outline"
-            className="h-7 w-7"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleNewConversation();
-            }}
-            title="Nova conversa"
-          >
-            <Plus className="w-3 h-3" />
-          </Button>
-          <ChevronDown
-            className={`w-3 h-3 transition-transform duration-200 text-muted-foreground ${
-              isConversationsOpen ? "rotate-0" : "-rotate-90"
-            }`}
-          />
-        </div>
-      </button>
-
-      {isConversationsOpen && (
-        <div className="flex-1 overflow-y-auto space-y-2 mt-2">
-          {conversations.length === 0 ? (
-            <p className="text-xs text-muted-foreground">Nenhuma conversa ainda.</p>
-          ) : (
-            conversations.map((conversation) => (
-              <button
-                key={conversation.id as string}
-                type="button"
-                onClick={() => handleSelectConversation(conversation.id as string)}
-                className={`w-full text-left rounded-lg border px-3 py-2 text-xs transition-colors ${
-                  conversation.id === currentConversationId
-                    ? "bg-primary/10 border-primary/60"
-                    : "bg-muted/40 border-border/40 hover:bg-muted/70"
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium line-clamp-1">
-                    {conversation.title || "Conversa sem título"}
-                  </span>
-                </div>
-                <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
-                  <Clock className="w-3 h-3" />
-                  <span>
-                    {conversation.updated_at
-                      ? new Date(conversation.updated_at as string).toLocaleString("pt-BR")
-                      : ""}
-                  </span>
-                </div>
-              </button>
-            ))
-          )}
-        </div>
-      )}
-    </aside>
-  );
+  const ConversationsSidebar = () => null;
 
   if (uiMode === "CHAT") {
     return (
