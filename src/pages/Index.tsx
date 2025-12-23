@@ -5,9 +5,10 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic, LogOut, Images } from "lucide-react";
+import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic, LogOut, Images, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 import type { User } from "@supabase/supabase-js";
 import VideoPlayer from "@/components/VideoPlayer";
 interface AdContent {
@@ -47,6 +48,8 @@ const Index = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [uiMode, setUiMode] = useState<"DASHBOARD" | "CHAT">("DASHBOARD");
+  const [conversations, setConversations] = useState<Tables<"conversations">[]>([]);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
   useEffect(() => {
     // Verifica se está autenticado
@@ -55,10 +58,21 @@ const Index = () => {
         navigate("/auth");
       } else {
         setUser(session.user);
+        supabase
+          .from("conversations")
+          .select("*")
+          .order("updated_at", { ascending: false })
+          .then(({ data, error }) => {
+            if (error) {
+              console.error("Erro ao carregar conversas:", error);
+              return;
+            }
+            if (data) setConversations(data as Tables<"conversations">[]);
+          });
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         navigate("/auth");
       } else {
