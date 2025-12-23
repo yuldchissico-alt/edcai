@@ -82,9 +82,12 @@ ${prompt}`;
       const data = await response.json();
       console.log("generate-image response:", data);
 
-      const imageData = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+      const imageEntry = data?.choices?.[0]?.message?.images?.[0]?.image_url;
+      const imageData =
+        typeof imageEntry === "string" ? imageEntry : imageEntry?.url;
+
       if (!imageData) {
-        console.error("No image data in response:", data);
+        console.error("No image data in response (generate-image):", data);
         throw new Error("Falha ao gerar imagem");
       }
 
