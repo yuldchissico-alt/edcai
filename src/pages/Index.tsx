@@ -288,383 +288,278 @@ const Index = () => {
             <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
           </div>
 
-          <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
-            <TabsList className="w-full max-w-xs mx-auto">
-              <TabsTrigger value="dashboard" className="flex-1">
-                Dashboard
-              </TabsTrigger>
-              <TabsTrigger value="chat" className="flex-1">
-                Chat de imagens
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="dashboard" className="flex-1">
-              <div className="w-full max-w-3xl space-y-8 mt-4">
-                <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
-                  <form
-                    className="flex items-center gap-3"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleImageChat();
-                    }}
-                  >
-                    <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
-                      <Plus className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <Textarea
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
-                      className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-                    />
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        className="rounded-full w-8 h-8 flex items-center justify-center bg-background/40 text-muted-foreground"
-                        aria-label="Microfone (em breve)"
-                      >
-                        <Mic className="w-4 h-4" />
-                      </button>
-                      <Button
-                        type="submit"
-                        size="icon"
-                        className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-                        disabled={loadingAd}
-                        aria-label="Gerar anúncio"
-                      >
-                        {loadingAd ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Sparkles className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </form>
-                </Card>
-
-
-          {chatMessages.length > 0 && (
-            <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col h-[60vh]">
-              <h2 className="text-sm font-medium">Assistente de imagem</h2>
-              <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-                {chatMessages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${
-                      msg.role === "user" ? "ml-auto" : "mr-auto"
-                    }`}
-                  >
-                    <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                      {msg.role === "user" ? "Você" : "IA"}
-                    </span>
-                    {msg.content && (
-                      <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                    )}
-                    {msg.imageUrl && (
-                      <div className="space-y-2">
-                        <div className="overflow-hidden rounded-lg border bg-background">
-                          <img
-                            src={msg.imageUrl}
-                            alt="Imagem gerada pela IA"
-                            className="w-full h-auto object-cover"
-                            loading="lazy"
-                          />
+          <div className="mt-6 flex-1 flex flex-col gap-6">
+            <div className="h-[calc(100vh-180px)] flex flex-col gap-4">
+              <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col flex-1">
+                <h2 className="text-sm font-medium">Assistente de imagem</h2>
+                <div className="space-y-3 flex-1 overflow-y-auto pr-1">
+                  {chatMessages.map((msg, index) => (
+                    <div
+                      key={index}
+                      className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${
+                        msg.role === "user" ? "ml-auto" : "mr-auto"
+                      }`}
+                    >
+                      <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                        {msg.role === "user" ? "Você" : "IA"}
+                      </span>
+                      {msg.content && (
+                        <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                      )}
+                      {msg.imageUrl && (
+                        <div className="space-y-2">
+                          <div className="overflow-hidden rounded-lg border bg-background">
+                            <img
+                              src={msg.imageUrl}
+                              alt="Imagem gerada pela IA"
+                              className="w-full h-auto object-cover"
+                              loading="lazy"
+                            />
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => {
+                              const a = document.createElement("a");
+                              a.href = msg.imageUrl!;
+                              a.download = "imagem-gerada.png";
+                              a.click();
+                            }}
+                          >
+                            Baixar imagem
+                          </Button>
                         </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            const a = document.createElement("a");
-                            a.href = msg.imageUrl!;
-                            a.download = "imagem-gerada.png";
-                            a.click();
-                          }}
-                        >
-                          Baixar imagem
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              {chatLoading && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                  Pensando na melhor forma de gerar sua imagem...
-                </p>
-              )}
-            </Card>
-          )}
-
-          {adContent && (
-            <section className="space-y-6">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                  Roteiro gerado
-                </h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGenerateVideo}
-                  disabled={generatingVideo}
-                >
-                  {generatingVideo ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Gerando cenas...
-                    </>
-                  ) : (
-                    <>
-                      <Video className="w-4 h-4 mr-2" />
-                      Gerar vídeo com 3 cenas
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              <Card className="p-6 border border-border/60 bg-background/80">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
-                        Hook
-                      </span>
-                      Abertura do anúncio
-                    </h3>
-                    <p className="text-sm leading-relaxed">{adContent.hook}</p>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={() => copyToClipboard(adContent.hook, "hook")}
-                    >
-                      {copiedField === "hook" ? (
-                        <>
-                          <CheckCircle2 className="w-3 h-3" /> Copiado
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3 h-3" /> Copiar
-                        </>
                       )}
-                    </button>
-                  </div>
-
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
-                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
-                        Script
-                      </span>
-                      Roteiro em 3 cenas
-                    </h3>
-                    <div className="grid gap-3 md:grid-cols-3 text-sm">
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                          Cena 1
-                        </p>
-                        <p className="leading-relaxed">{adContent.script.scene1}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                          Cena 2
-                        </p>
-                        <p className="leading-relaxed">{adContent.script.scene2}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                          Cena 3
-                        </p>
-                        <p className="leading-relaxed">{adContent.script.scene3}</p>
-                      </div>
                     </div>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                      onClick={() =>
-                        copyToClipboard(
-                          `${adContent.script.scene1}\n\n${adContent.script.scene2}\n\n${adContent.script.scene3}`,
-                          "script",
-                        )
-                      }
-                    >
-                      {copiedField === "script" ? (
-                        <>
-                          <CheckCircle2 className="w-3 h-3" /> Script copiado
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3 h-3" /> Copiar script completo
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-[2fr,1fr] items-start">
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-semibold flex items-center gap-2">
-                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
-                          Legenda
-                        </span>
-                        Texto para a descrição
-                      </h3>
-                      <p className="text-sm leading-relaxed whitespace-pre-line">
-                        {adContent.caption}
+                  ))}
+                  {chatMessages.length === 0 && !chatLoading && (
+                    <div className="h-full flex items-center justify-center text-center text-sm text-muted-foreground px-6">
+                      <p>
+                        Comece descrevendo a imagem que você quer gerar. A IA vai sugerir melhorias no prompt
+                        e, quando estiver pronto, gerar a imagem para você.
                       </p>
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                        onClick={() => copyToClipboard(adContent.caption, "caption")}
-                      >
-                        {copiedField === "caption" ? (
-                          <>
-                            <CheckCircle2 className="w-3 h-3" /> Copiado
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" /> Copiar legenda
-                          </>
-                        )}
-                      </button>
                     </div>
-
-                    <div className="space-y-2">
-                      <h3 className="text-sm font-semibold flex items-center gap-2">
-                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
-                          CTA
-                        </span>
-                        Chamada para ação
-                      </h3>
-                      <p className="text-sm leading-relaxed">{adContent.cta}</p>
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                        onClick={() => copyToClipboard(adContent.cta, "cta")}
-                      >
-                        {copiedField === "cta" ? (
-                          <>
-                            <CheckCircle2 className="w-3 h-3" /> Copiado
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" /> Copiar CTA
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
+                  )}
+                  {chatLoading && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Pensando na melhor forma de gerar sua imagem...
+                    </p>
+                  )}
                 </div>
               </Card>
-            </section>
-          )}
 
-          {videoFrames && adContent && (
-            <section className="space-y-6">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
-                  <Video className="w-5 h-5 text-primary" />
-                  Prévia das cenas
-                </h2>
-              </div>
-
-              <VideoPlayer frames={videoFrames} script={adContent.script} />
-            </section>
-          )}
-
-        </div>
-      </TabsContent>
-
-      <TabsContent value="chat" className="flex-1 mt-4">
-          <div className="h-[70vh] flex flex-col gap-4">
-            <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col flex-1">
-              <h2 className="text-sm font-medium">Assistente de imagem</h2>
-              <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-                {chatMessages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${
-                      msg.role === "user" ? "ml-auto" : "mr-auto"
-                    }`}
-                  >
-                    <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                      {msg.role === "user" ? "Você" : "IA"}
-                    </span>
-                    {msg.content && (
-                      <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                    )}
-                    {msg.imageUrl && (
-                      <div className="space-y-2">
-                        <div className="overflow-hidden rounded-lg border bg-background">
-                          <img
-                            src={msg.imageUrl}
-                            alt="Imagem gerada pela IA"
-                            className="w-full h-auto object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            const a = document.createElement("a");
-                            a.href = msg.imageUrl!;
-                            a.download = "imagem-gerada.png";
-                            a.click();
-                          }}
-                        >
-                          Baixar imagem
-                        </Button>
-                      </div>
-                    )}
+              <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
+                <form
+                  className="flex items-center gap-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleImageChat();
+                  }}
+                >
+                  <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
+                    <Plus className="w-4 h-4 text-muted-foreground" />
                   </div>
-                ))}
-              </div>
-              {chatLoading && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                  Pensando na melhor forma de gerar sua imagem...
-                </p>
-              )}
-            </Card>
+                  <Textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Descreva a imagem que quer gerar..."
+                    className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+                  />
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button
+                      type="submit"
+                      size="icon"
+                      className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                      disabled={chatLoading || generatingImage}
+                      aria-label="Enviar para IA de imagem"
+                    >
+                      {chatLoading || generatingImage ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ImageIcon className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </Card>
+            </div>
 
-            <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
-              <form
-                className="flex items-center gap-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleImageChat();
-                }}
-              >
-                <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
-                  <Plus className="w-4 h-4 text-muted-foreground" />
-                </div>
-                <Textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Descreva a imagem que quer gerar..."
-                  className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-                />
-                <div className="flex items-center gap-2 shrink-0">
+            {adContent && (
+              <section className="space-y-6 mt-8">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    Roteiro gerado
+                  </h2>
                   <Button
-                    type="submit"
-                    size="icon"
-                    className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-                    disabled={chatLoading || generatingImage}
-                    aria-label="Enviar para IA de imagem"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateVideo}
+                    disabled={generatingVideo}
                   >
-                    {chatLoading || generatingImage ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                    {generatingVideo ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Gerando cenas...
+                      </>
                     ) : (
-                      <ImageIcon className="w-4 h-4" />
+                      <>
+                        <Video className="w-4 h-4 mr-2" />
+                        Gerar vídeo com 3 cenas
+                      </>
                     )}
                   </Button>
                 </div>
-              </form>
-            </Card>
+
+                <Card className="p-6 border border-border/60 bg-background/80">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold flex items-center gap-2">
+                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
+                          Hook
+                        </span>
+                        Abertura do anúncio
+                      </h3>
+                      <p className="text-sm leading-relaxed">{adContent.hook}</p>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                        onClick={() => copyToClipboard(adContent.hook, "hook")}
+                      >
+                        {copiedField === "hook" ? (
+                          <>
+                            <CheckCircle2 className="w-3 h-3" /> Copiado
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" /> Copiar
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-semibold flex items-center gap-2">
+                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
+                          Script
+                        </span>
+                        Roteiro em 3 cenas
+                      </h3>
+                      <div className="grid gap-3 md:grid-cols-3 text-sm">
+                        <div className="space-y-2">
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Cena 1
+                          </p>
+                          <p className="leading-relaxed">{adContent.script.scene1}</p>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Cena 2
+                          </p>
+                          <p className="leading-relaxed">{adContent.script.scene2}</p>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                            Cena 3
+                          </p>
+                          <p className="leading-relaxed">{adContent.script.scene3}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                        onClick={() =>
+                          copyToClipboard(
+                            `${adContent.script.scene1}\n\n${adContent.script.scene2}\n\n${adContent.script.scene3}`,
+                            "script",
+                          )
+                        }
+                      >
+                        {copiedField === "script" ? (
+                          <>
+                            <CheckCircle2 className="w-3 h-3" /> Script copiado
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" /> Copiar script completo
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-[2fr,1fr] items-start">
+                      <div className="space-y-2">
+                        <h3 className="text-sm font-semibold flex items-center gap-2">
+                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
+                            Legenda
+                          </span>
+                          Texto para a descrição
+                        </h3>
+                        <p className="text-sm leading-relaxed whitespace-pre-line">
+                          {adContent.caption}
+                        </p>
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                          onClick={() => copyToClipboard(adContent.caption, "caption")}
+                        >
+                          {copiedField === "caption" ? (
+                            <>
+                              <CheckCircle2 className="w-3 h-3" /> Copiado
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" /> Copiar legenda
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h3 className="text-sm font-semibold flex items-center gap-2">
+                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
+                            CTA
+                          </span>
+                          Chamada para ação
+                        </h3>
+                        <p className="text-sm leading-relaxed">{adContent.cta}</p>
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                          onClick={() => copyToClipboard(adContent.cta, "cta")}
+                        >
+                          {copiedField === "cta" ? (
+                            <>
+                              <CheckCircle2 className="w-3 h-3" /> Copiado
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" /> Copiar CTA
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </section>
+            )}
+
+            {videoFrames && adContent && (
+              <section className="space-y-6 mt-8">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                    <Video className="w-5 h-5 text-primary" />
+                    Prévia das cenas
+                  </h2>
+                </div>
+
+                <VideoPlayer frames={videoFrames} script={adContent.script} />
+              </section>
+            )}
           </div>
-        </TabsContent>
-      </Tabs>
     </div>
   </section>
 </main>
