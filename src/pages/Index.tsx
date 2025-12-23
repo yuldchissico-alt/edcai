@@ -575,45 +575,45 @@ const Index = () => {
               </TabsList>
 
               <TabsContent value="dashboard" className="flex-1 w-full">
-                <div className="w-full max-w-3xl space-y-8 mt-4">
-                  <Card className="bg-card/80 border-border/60 px-4 py-3 md:px-6 md:py-4 rounded-2xl shadow-sm max-w-3xl mx-auto">
-                    <form
-                      className="flex items-center gap-3 md:gap-4"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        handleImageChat();
-                        setPrompt("");
-                      }}
-                    >
-                      <div className="shrink-0 rounded-full bg-muted w-9 h-9 flex items-center justify-center">
-                        <Plus className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <Textarea
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
-                        className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-                      />
-                      <div className="flex items-center gap-2 shrink-0">
-                        <button
-                          type="button"
-                          className="rounded-full w-9 h-9 flex items-center justify-center bg-muted text-muted-foreground"
-                          aria-label="Microfone (em breve)"
-                        >
-                          <Mic className="w-4 h-4" />
-                        </button>
-                        <Button
-                          type="submit"
-                          size="icon"
-                          className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-                          disabled={loadingAd}
-                          aria-label="Gerar anúncio"
-                        >
-                          {loadingAd ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                        </Button>
-                      </div>
-                    </form>
-                  </Card>
+                  <div className="w-full max-w-3xl space-y-8 mt-4 mx-auto">
+                    <Card className="bg-card/80 border-border/60 px-4 py-3 md:px-6 md:py-4 rounded-2xl shadow-sm max-w-3xl mx-auto">
+                      <form
+                        className="flex items-center gap-3 md:gap-4"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          handleImageChat();
+                          setPrompt("");
+                        }}
+                      >
+                        <div className="shrink-0 rounded-full bg-muted w-9 h-9 flex items-center justify-center">
+                          <Plus className="w-4 h-4 text-muted-foreground" />
+                        </div>
+                        <Textarea
+                          value={prompt}
+                          onChange={(e) => setPrompt(e.target.value)}
+                          placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
+                          className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+                        />
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            type="button"
+                            className="rounded-full w-9 h-9 flex items-center justify-center bg-muted text-muted-foreground"
+                            aria-label="Microfone (em breve)"
+                          >
+                            <Mic className="w-4 h-4" />
+                          </button>
+                          <Button
+                            type="submit"
+                            size="icon"
+                            className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                            disabled={loadingAd}
+                            aria-label="Gerar anúncio"
+                          >
+                            {loadingAd ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                          </Button>
+                        </div>
+                      </form>
+                    </Card>
 
                   <div className="flex flex-col items-center gap-4 text-xs md:text-sm text-muted-foreground text-center">
                     <div className="flex flex-wrap items-center justify-center gap-2">
