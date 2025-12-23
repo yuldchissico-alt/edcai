@@ -202,15 +202,15 @@ export default function Gallery() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+      <div className="max-w-6xl mx-auto px-4 py-6 md:py-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 md:mb-8">
+          <div className="flex items-center gap-3 md:gap-4 min-w-0">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold">Minhas Fotos</h1>
-              <p className="text-sm text-muted-foreground mt-1">
+            <div className="min-w-0">
+              <h1 className="text-2xl md:text-3xl font-bold truncate">Minhas Fotos</h1>
+              <p className="text-xs md:text-sm text-muted-foreground mt-1">
                 {photos.length} {photos.length === 1 ? "foto" : "fotos"}
               </p>
             </div>
@@ -218,8 +218,8 @@ export default function Gallery() {
         </div>
 
         {/* Upload Section */}
-        <Card className="p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Enviar Nova Foto</h2>
+        <Card className="p-4 md:p-6 mb-6 md:mb-8">
+          <h2 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Enviar Nova Foto</h2>
           
           <div className="space-y-4">
             <div
@@ -227,7 +227,7 @@ export default function Gallery() {
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              className={`border-2 border-dashed rounded-lg p-4 sm:p-6 md:p-8 text-center transition-colors ${
                 dragActive
                   ? "border-primary bg-primary/5"
                   : "border-border hover:border-primary/50"
@@ -243,11 +243,11 @@ export default function Gallery() {
               
               {selectedFile ? (
                 <div className="space-y-4">
-                  <div className="relative inline-block">
+                  <div className="relative inline-block max-w-full">
                     <img
                       src={URL.createObjectURL(selectedFile)}
                       alt="Preview"
-                      className="max-h-48 rounded-lg"
+                      className="max-h-56 w-full object-contain rounded-lg"
                     />
                     <Button
                       variant="destructive"
@@ -258,11 +258,11 @@ export default function Gallery() {
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground">{selectedFile.name}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground break-all">{selectedFile.name}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
+                  <Upload className="w-10 h-10 md:w-12 md:h-12 mx-auto text-muted-foreground" />
                   <div>
                     <p className="text-sm text-foreground mb-1">
                       Arraste uma foto aqui ou
