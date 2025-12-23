@@ -330,52 +330,6 @@ const Index = () => {
                 </div>
 
                 <div className="grid gap-6">
-                  {/* Video Player */}
-                  {!videoFrames && !generatingVideo && (
-                    <Card className="p-6 border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-accent/10">
-                      <div className="text-center space-y-4">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent mb-2">
-                          <Video className="w-8 h-8 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-lg mb-2">Gerar Vídeo do Anúncio</h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Transforme seu roteiro em 3 cenas visuais geradas com IA.
-                          </p>
-                        </div>
-                        <Button
-                          onClick={handleGenerateVideo}
-                          disabled={generatingVideo}
-                          size="lg"
-                          className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
-                        >
-                          <Video className="mr-2 h-5 w-5" />
-                          Gerar Vídeo com IA
-                        </Button>
-                      </div>
-                    </Card>
-                  )}
-
-                  {generatingVideo && (
-                    <Card className="p-8 border-2 border-primary/20">
-                      <div className="text-center space-y-4">
-                        <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-                        <div>
-                          <h3 className="font-bold text-lg">Gerando suas cenas...</h3>
-                          <p className="text-sm text-muted-foreground mt-2">
-                            A IA está criando 3 cenas visuais únicas para seu anúncio.
-                            <br />
-                            Isso pode levar até 30 segundos.
-                          </p>
-                        </div>
-                      </div>
-                    </Card>
-                  )}
-
-                  {videoFrames && (
-                    <VideoPlayer frames={videoFrames} script={adContent.script} />
-                  )}
-
                   {/* Hook */}
                   <Card className="p-6 border-2 border-primary/20">
                     <div className="flex items-start justify-between mb-3 gap-4">
