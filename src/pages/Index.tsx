@@ -657,26 +657,6 @@ const Index = () => {
                   </Card>
 
                   <div className="flex flex-col items-center gap-4 text-xs md:text-sm text-muted-foreground text-center">
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                      <span className="font-medium text-foreground/80">Ações rápidas:</span>
-                      <button
-                        type="button"
-                        className="px-3 py-1.5 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors text-xs md:text-sm"
-                        onClick={handleGenerateAd}
-                        disabled={loadingAd}
-                      >
-                        Gerar anúncio
-                      </button>
-                      <button
-                        type="button"
-                        className="px-3 py-1.5 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors text-xs md:text-sm"
-                        onClick={handleGenerateImages}
-                        disabled={generatingImage || chatLoading}
-                      >
-                        Gerar imagens
-                      </button>
-                    </div>
-
                     <div className="flex items-center justify-center gap-2">
                       <span>Formato da imagem:</span>
                       <Select value={imageAspect} onValueChange={setImageAspect}>
