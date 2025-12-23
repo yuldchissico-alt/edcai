@@ -307,214 +307,76 @@ const Index = () => {
         </div>
       </section>
 
-      {(adContent || imageResult) && (
+      {imageResult && (
         <section className="border-t border-border/40 bg-background/95 backdrop-blur-sm px-4 py-10">
           <div className="max-w-5xl mx-auto space-y-8">
-            {adContent && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    Resultado do anúncio
-                  </h2>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setAdContent(null);
-                      setVideoFrames(null);
-                    }}
-                  >
-                    Limpar anúncio
-                  </Button>
-                </div>
-
-                <div className="grid gap-6">
-                  {/* Hook */}
-                  <Card className="p-6 border-2 border-primary/20">
-                    <div className="flex items-start justify-between mb-3 gap-4">
-                      <div>
-                        <h3 className="font-bold text-lg">Hook (Gancho)</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Use como primeira linha do vídeo ou criativo.
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(adContent.hook, "hook")}
-                      >
-                        {copiedField === "hook" ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <p className="text-lg font-medium">{adContent.hook}</p>
-                  </Card>
-
-                  {/* Script */}
-                  <Card className="p-6 border-2 border-secondary/20">
-                    <div className="flex items-start justify-between mb-3 gap-4">
-                      <div>
-                        <h3 className="font-bold text-lg">Roteiro Visual (3 cenas)</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Estrutura do vídeo em blocos.
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          copyToClipboard(
-                            `Cena 1: ${adContent.script.scene1}\nCena 2: ${adContent.script.scene2}\nCena 3: ${adContent.script.scene3}`,
-                            "script",
-                          )
-                        }
-                      >
-                        {copiedField === "script" ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <ul className="space-y-2 text-sm">
-                      <li>
-                        <span className="font-semibold">Cena 1:</span> {adContent.script.scene1}
-                      </li>
-                      <li>
-                        <span className="font-semibold">Cena 2:</span> {adContent.script.scene2}
-                      </li>
-                      <li>
-                        <span className="font-semibold">Cena 3:</span> {adContent.script.scene3}
-                      </li>
-                    </ul>
-                  </Card>
-
-                  {/* Caption */}
-                  <Card className="p-6 border-2 border-secondary/20">
-                    <div className="flex items-start justify-between mb-3 gap-4">
-                      <div>
-                        <h3 className="font-bold text-lg">Legenda</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Use como descrição do anúncio ou post.
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(adContent.caption, "caption")}
-                      >
-                        {copiedField === "caption" ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <p className="whitespace-pre-line text-sm leading-relaxed">
-                      {adContent.caption}
-                    </p>
-                  </Card>
-
-                  {/* CTA */}
-                  <Card className="p-6 border-2 border-secondary/20">
-                    <div className="flex items-start justify-between mb-3 gap-4">
-                      <div>
-                        <h3 className="font-bold text-lg">Call to Action</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Frase final para puxar o clique ou mensagem.
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(adContent.cta, "cta")}
-                      >
-                        {copiedField === "cta" ? (
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <p className="text-sm font-medium">{adContent.cta}</p>
-                  </Card>
-                </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5 text-primary" />
+                  Imagens geradas
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setImageResult(null)}
+                >
+                  Limpar imagens
+                </Button>
               </div>
-            )}
 
-            {imageResult && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
-                    <ImageIcon className="w-5 h-5 text-primary" />
-                    Imagens geradas
-                  </h2>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setImageResult(null)}
-                  >
-                    Limpar imagens
-                  </Button>
-                </div>
-
-                <Card className="p-6 border-2 border-secondary/30 bg-gradient-to-br from-background to-muted/40">
-                  <div className="grid gap-4 md:grid-cols-2 mt-2">
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-sm">Versão Natural (UGC)</h4>
-                      <div className="overflow-hidden rounded-lg border bg-background">
-                        <img
-                          src={imageResult.natural}
-                          alt="Imagem gerada - estilo natural UGC"
-                          className="w-full h-auto object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => {
-                          const a = document.createElement("a");
-                          a.href = imageResult.natural;
-                          a.download = "imagem-natural.png";
-                          a.click();
-                        }}
-                      >
-                        Baixar versão natural
-                      </Button>
+              <Card className="p-6 border-2 border-secondary/30 bg-gradient-to-br from-background to-muted/40">
+                <div className="grid gap-4 md:grid-cols-2 mt-2">
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm">Versão Natural (UGC)</h4>
+                    <div className="overflow-hidden rounded-lg border bg-background">
+                      <img
+                        src={imageResult.natural}
+                        alt="Imagem gerada - estilo natural UGC"
+                        className="w-full h-auto object-cover"
+                        loading="lazy"
+                      />
                     </div>
-
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-sm">Versão Profissional / Corporativa</h4>
-                      <div className="overflow-hidden rounded-lg border bg-background">
-                        <img
-                          src={imageResult.corporate}
-                          alt="Imagem gerada - estilo profissional corporativo"
-                          className="w-full h-auto object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => {
-                          const a = document.createElement("a");
-                          a.href = imageResult.corporate;
-                          a.download = "imagem-profissional.png";
-                          a.click();
-                        }}
-                      >
-                        Baixar versão profissional
-                      </Button>
-                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        const a = document.createElement("a");
+                        a.href = imageResult.natural;
+                        a.download = "imagem-natural.png";
+                        a.click();
+                      }}
+                    >
+                      Baixar versão natural
+                    </Button>
                   </div>
-                </Card>
-              </div>
-            )}
+
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-sm">Versão Profissional / Corporativa</h4>
+                    <div className="overflow-hidden rounded-lg border bg-background">
+                      <img
+                        src={imageResult.corporate}
+                        alt="Imagem gerada - estilo profissional corporativo"
+                        className="w-full h-auto object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        const a = document.createElement("a");
+                        a.href = imageResult.corporate;
+                        a.download = "imagem-profissional.png";
+                        a.click();
+                      }}
+                    >
+                      Baixar versão profissional
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
         </section>
       )}
@@ -523,3 +385,4 @@ const Index = () => {
 };
 
 export default Index;
+
