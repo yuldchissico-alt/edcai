@@ -67,10 +67,6 @@ serve(async (req) => {
               },
             },
           ],
-          tool_choice: {
-            type: "function",
-            function: { name: "decide_image_generation" },
-          },
         }),
       },
     );
