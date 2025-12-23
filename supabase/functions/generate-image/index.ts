@@ -38,11 +38,9 @@ Aspect ratio: ${resolvedAspect}.
 User prompt (Portuguese, describe subject, setting, mood):
 ${prompt}`;
 
-    async function generateVariant(variant: "natural" | "corporate") {
+    async function generateImage() {
       const styleHint =
-        variant === "natural"
-          ? "Style: natural, lifestyle, user-generated content, candid moment, everyday context."
-          : "Style: professional, corporate, clean composition, suitable for paid ads and landing pages.";
+        "Style: natural, lifestyle, user-generated content, candid moment, everyday context. Focus on realism and professional lighting.";
 
       const response = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -82,28 +80,22 @@ ${prompt}`;
       }
 
       const data = await response.json();
-      console.log("generate-image response (", variant, "):", data);
+      console.log("generate-image response:", data);
 
       const imageData = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
       if (!imageData) {
-        console.error("No image data in response for variant", variant, data);
+        console.error("No image data in response:", data);
         throw new Error("Falha ao gerar imagem");
       }
 
       return imageData as string;
     }
 
-    const [naturalImage, corporateImage] = await Promise.all([
-      generateVariant("natural"),
-      generateVariant("corporate"),
-    ]);
+    const image = await generateImage();
 
     return new Response(
       JSON.stringify({
-        images: {
-          natural: naturalImage,
-          corporate: corporateImage,
-        },
+        image,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
