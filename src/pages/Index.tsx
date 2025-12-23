@@ -40,6 +40,11 @@ interface VideoFrames {
   scene3: string;
 }
 
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 const Index = () => {
   const { toast } = useToast();
   const [prompt, setPrompt] = useState("");
@@ -53,6 +58,8 @@ const Index = () => {
   const [imageAspect, setImageAspect] = useState("9:16");
   const [imageResult, setImageResult] = useState<string | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -187,8 +194,62 @@ const Index = () => {
     }
   };
 
+  const handleImageChat = async (initialPrompt?: string) => {
+    const messageContent = (initialPrompt ?? prompt).trim();
+
+    if (!messageContent) {
+      toast({
+        title: "Digite um prompt",
+        description: "Descreva a imagem que deseja gerar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newMessages: ChatMessage[] = [
+      ...chatMessages,
+      { role: "user", content: messageContent },
+    ];
+
+    setChatMessages(newMessages);
+    setChatLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "image-chat-assistant",
+        {
+          body: { messages: newMessages },
+        },
+      );
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error as string);
+
+      if (data?.reply) {
+        setChatMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: data.reply as string },
+        ]);
+      }
+
+      if (data?.ready && data.finalPrompt) {
+        await generateImagesFromPrompt(data.finalPrompt as string);
+      }
+    } catch (err) {
+      console.error("Error in image chat:", err);
+      toast({
+        title: "Erro ao conversar com a IA de imagem",
+        description:
+          err instanceof Error ? err.message : "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   const handleGenerateImages = async () => {
-    await generateImagesFromPrompt(prompt);
+    await handleImageChat();
   };
 
   return (
@@ -217,6 +278,12 @@ const Index = () => {
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
               className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleImageChat();
+                }
+              }}
             />
             <div className="flex items-center gap-2 shrink-0">
               <button
@@ -257,7 +324,7 @@ const Index = () => {
                 type="button"
                 className="px-3 py-1 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors"
                 onClick={handleGenerateImages}
-                disabled={generatingImage}
+                disabled={generatingImage || chatLoading}
               >
                 Gerar imagens
               </button>
@@ -301,6 +368,207 @@ const Index = () => {
               ))}
             </div>
           </div>
+
+          {chatMessages.length > 0 && (
+            <Card className="bg-muted/40 border-border/60 p-4 space-y-3">
+              <h2 className="text-sm font-medium">Assistente de imagem</h2>
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                {chatMessages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`rounded-lg px-3 py-2 text-sm border border-border/40 bg-background/60 ${
+                      msg.role === "user" ? "ml-auto" : "mr-auto"
+                    }`}
+                  >
+                    <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                      {msg.role === "user" ? "Você" : "IA"}
+                    </span>
+                    <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                  </div>
+                ))}
+              </div>
+              {chatLoading && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Pensando na melhor forma de gerar sua imagem...
+                </p>
+              )}
+            </Card>
+          )}
+
+          {adContent && (
+            <section className="space-y-6">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Roteiro gerado
+                </h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateVideo}
+                  disabled={generatingVideo}
+                >
+                  {generatingVideo ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Gerando cenas...
+                    </>
+                  ) : (
+                    <>
+                      <Video className="w-4 h-4 mr-2" />
+                      Gerar vídeo com 3 cenas
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <Card className="p-6 border border-border/60 bg-background/80">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
+                        Hook
+                      </span>
+                      Abertura do anúncio
+                    </h3>
+                    <p className="text-sm leading-relaxed">{adContent.hook}</p>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => copyToClipboard(adContent.hook, "hook")}
+                    >
+                      {copiedField === "hook" ? (
+                        <>
+                          <CheckCircle2 className="w-3 h-3" /> Copiado
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" /> Copiar
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
+                        Script
+                      </span>
+                      Roteiro em 3 cenas
+                    </h3>
+                    <div className="grid gap-3 md:grid-cols-3 text-sm">
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Cena 1
+                        </p>
+                        <p className="leading-relaxed">{adContent.script.scene1}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Cena 2
+                        </p>
+                        <p className="leading-relaxed">{adContent.script.scene2}</p>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          Cena 3
+                        </p>
+                        <p className="leading-relaxed">{adContent.script.scene3}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() =>
+                        copyToClipboard(
+                          `${adContent.script.scene1}\n\n${adContent.script.scene2}\n\n${adContent.script.scene3}`,
+                          "script",
+                        )
+                      }
+                    >
+                      {copiedField === "script" ? (
+                        <>
+                          <CheckCircle2 className="w-3 h-3" /> Script copiado
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" /> Copiar script completo
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-[2fr,1fr] items-start">
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold flex items-center gap-2">
+                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
+                          Legenda
+                        </span>
+                        Texto para a descrição
+                      </h3>
+                      <p className="text-sm leading-relaxed whitespace-pre-line">
+                        {adContent.caption}
+                      </p>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                        onClick={() => copyToClipboard(adContent.caption, "caption")}
+                      >
+                        {copiedField === "caption" ? (
+                          <>
+                            <CheckCircle2 className="w-3 h-3" /> Copiado
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" /> Copiar legenda
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold flex items-center gap-2">
+                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[11px] font-medium text-primary">
+                          CTA
+                        </span>
+                        Chamada para ação
+                      </h3>
+                      <p className="text-sm leading-relaxed">{adContent.cta}</p>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                        onClick={() => copyToClipboard(adContent.cta, "cta")}
+                      >
+                        {copiedField === "cta" ? (
+                          <>
+                            <CheckCircle2 className="w-3 h-3" /> Copiado
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" /> Copiar CTA
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </section>
+          )}
+
+          {videoFrames && adContent && (
+            <section className="space-y-6">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                  <Video className="w-5 h-5 text-primary" />
+                  Prévia das cenas
+                </h2>
+              </div>
+
+              <VideoPlayer frames={videoFrames} script={adContent.script} />
+            </section>
+          )}
         </div>
       </section>
 
@@ -355,4 +623,3 @@ const Index = () => {
 };
 
 export default Index;
-
