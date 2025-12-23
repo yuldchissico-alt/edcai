@@ -145,8 +145,8 @@ const Index = () => {
     }
   };
 
-  const handleGenerateImages = async () => {
-    if (!prompt.trim()) {
+  const generateImagesFromPrompt = async (promptText: string) => {
+    if (!promptText.trim()) {
       toast({
         title: "Digite um prompt",
         description: "Descreva a imagem que deseja gerar",
@@ -164,7 +164,7 @@ const Index = () => {
 
       const { data, error } = await supabase.functions.invoke("generate-image", {
         body: {
-          prompt,
+          prompt: promptText,
           aspectRatio: imageAspect,
         },
       });
@@ -188,6 +188,10 @@ const Index = () => {
     } finally {
       setGeneratingImage(false);
     }
+  };
+
+  const handleGenerateImages = async () => {
+    await generateImagesFromPrompt(prompt);
   };
 
   return (
@@ -280,16 +284,19 @@ const Index = () => {
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">Exemplos de prompts de imagem:</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm">
-              {[ 
+              {[
                 "Crie a foto de uma mulher mocambicana, 30 anos, cabelo natural preto, sorrindo confiante, em um escritório moderno, iluminação natural, estilo realista, pronta para anúncio em redes sociais.",
                 "Foto de um homem jovem empreendedor, sentado em frente ao notebook em um coworking moderno, estilo lifestyle, luz suave, focado em negócios digitais.",
                 "Imagem de produto cosmético minimalista apoiado em superfície de pedra, fundo desfocado, luz lateral dramática, estilo editorial premium.",
-                "Foto de casal se exercitando ao ar livre ao pôr do sol, clima de conquista e bem-estar, cores quentes, estilo campanha fitness profissional."
+                "Foto de casal se exercitando ao ar livre ao pôr do sol, clima de conquista e bem-estar, cores quentes, estilo campanha fitness profissional.",
               ].map((example) => (
                 <button
                   key={example}
                   type="button"
-                  onClick={() => setPrompt(example)}
+                  onClick={() => {
+                    setPrompt(example);
+                    generateImagesFromPrompt(example);
+                  }}
                   className="text-left px-3 py-2 rounded-lg bg-muted/60 hover:bg-muted transition-colors border border-border/40"
                 >
                   {example}
