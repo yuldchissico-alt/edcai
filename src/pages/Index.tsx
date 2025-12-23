@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Loader2,
   Sparkles,
@@ -259,64 +260,70 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col">
-      <section
-        className={`flex-1 flex flex-col items-center px-4 py-16 ${chatMessages.length > 0 ? "justify-start" : "justify-center"}`}
-      >
-        <div className="w-full max-w-3xl space-y-8">
-          <div className="text-center space-y-3">
-            <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
-              Estúdio de Criativos com IA
-            </p>
-            <h1 className="text-3xl md:text-4xl font-semibold">
-              Como posso te ajudar hoje?
-            </h1>
-            <p className="text-sm md:text-base text-muted-foreground">
-              Digite em linguagem natural o que você quer: anúncio, roteiro, criativo de imagem
-              ou ideia de vídeo.
-            </p>
+      <section className="flex-1 flex flex-col items-center px-4 py-6 md:py-10">
+        <div className="w-full max-w-5xl flex flex-col gap-6">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="space-y-1">
+              <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
+                Estúdio de Criativos com IA
+              </p>
+              <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
+            </div>
           </div>
 
-          <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
-            <form
-              className="flex items-center gap-3"
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleImageChat();
-              }}
-            >
-              <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
-                <Plus className="w-4 h-4 text-muted-foreground" />
-              </div>
-              <Textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
-                className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-              />
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  className="rounded-full w-8 h-8 flex items-center justify-center bg-background/40 text-muted-foreground"
-                  aria-label="Microfone (em breve)"
-                >
-                  <Mic className="w-4 h-4" />
-                </button>
-                <Button
-                  type="submit"
-                  size="icon"
-                  className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-                  disabled={loadingAd}
-                  aria-label="Gerar anúncio"
-                >
-                  {loadingAd ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="w-4 h-4" />
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Card>
+          <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
+            <TabsList className="w-full max-w-xs">
+              <TabsTrigger value="dashboard" className="flex-1">
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger value="chat" className="flex-1">
+                Chat de imagens
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="dashboard" className="flex-1">
+              <div className="w-full max-w-3xl space-y-8 mt-4">
+                <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
+                  <form
+                    className="flex items-center gap-3"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleImageChat();
+                    }}
+                  >
+                    <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
+                      <Plus className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <Textarea
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
+                      className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        className="rounded-full w-8 h-8 flex items-center justify-center bg-background/40 text-muted-foreground"
+                        aria-label="Microfone (em breve)"
+                      >
+                        <Mic className="w-4 h-4" />
+                      </button>
+                      <Button
+                        type="submit"
+                        size="icon"
+                        className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                        disabled={loadingAd}
+                        aria-label="Gerar anúncio"
+                      >
+                        {loadingAd ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </Card>
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-muted-foreground">
             <div className="flex flex-wrap items-center gap-2">
@@ -605,9 +612,104 @@ const Index = () => {
               <VideoPlayer frames={videoFrames} script={adContent.script} />
             </section>
           )}
+
         </div>
-      </section>
-    </main>
+      </TabsContent>
+
+      <TabsContent value="chat" className="flex-1 mt-4">
+          <div className="h-[70vh] flex flex-col gap-4">
+            <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col flex-1">
+              <h2 className="text-sm font-medium">Assistente de imagem</h2>
+              <div className="space-y-3 flex-1 overflow-y-auto pr-1">
+                {chatMessages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${
+                      msg.role === "user" ? "ml-auto" : "mr-auto"
+                    }`}
+                  >
+                    <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                      {msg.role === "user" ? "Você" : "IA"}
+                    </span>
+                    {msg.content && (
+                      <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    )}
+                    {msg.imageUrl && (
+                      <div className="space-y-2">
+                        <div className="overflow-hidden rounded-lg border bg-background">
+                          <img
+                            src={msg.imageUrl}
+                            alt="Imagem gerada pela IA"
+                            className="w-full h-auto object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => {
+                            const a = document.createElement("a");
+                            a.href = msg.imageUrl!;
+                            a.download = "imagem-gerada.png";
+                            a.click();
+                          }}
+                        >
+                          Baixar imagem
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {chatLoading && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Pensando na melhor forma de gerar sua imagem...
+                </p>
+              )}
+            </Card>
+
+            <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
+              <form
+                className="flex items-center gap-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleImageChat();
+                }}
+              >
+                <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
+                  <Plus className="w-4 h-4 text-muted-foreground" />
+                </div>
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Descreva a imagem que quer gerar..."
+                  className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button
+                    type="submit"
+                    size="icon"
+                    className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                    disabled={chatLoading || generatingImage}
+                    aria-label="Enviar para IA de imagem"
+                  >
+                    {chatLoading || generatingImage ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <ImageIcon className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  </section>
+</main>
   );
 };
 
