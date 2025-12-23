@@ -243,8 +243,9 @@ const Index = () => {
 
             <TabsContent value="dashboard" className="flex-1">
               <div className="w-full max-w-3xl space-y-8 mt-4">
-                <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
+            <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm max-w-3xl mx-auto">
                   <form className="flex items-center gap-3" onSubmit={e => {
+                  e.preventDefault();
                   e.preventDefault();
                   handleImageChat();
                 }}>
