@@ -561,7 +561,8 @@ const Index = () => {
     );
   }
 
-  return <main className="min-h-screen bg-background text-foreground flex items-center justify-center">
+  return (
+    <main className="min-h-screen bg-background text-foreground flex items-center justify-center">
       <section className="flex-1 flex flex-col px-4 py-6 md:py-10 relative">
         <div className="absolute top-4 right-4 flex items-center gap-2">
           <Button 
@@ -991,8 +992,10 @@ const Index = () => {
             </TabsContent>
           </Tabs>
         </div>
+      </div>
       </section>
-    </main>;
-
+    </main>
+  );
 };
+
 export default Index;
