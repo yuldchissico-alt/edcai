@@ -449,23 +449,26 @@ const Index = () => {
 
   if (uiMode === "CHAT") {
     return (
-      <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-6 md:py-10">
+      <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/60 text-foreground flex items-center justify-center px-4 py-6 md:py-10">
         <section className="w-full max-w-5xl mx-auto flex gap-4 h-full max-h-[90vh]">
           <ConversationsSidebar />
 
-          <div className="flex-1 flex flex-col gap-4">
-            <header className="flex items-center justify-between gap-2">
-              <div>
-                <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="flex-1 flex flex-col gap-5 animate-fade-in">
+            <header className="flex items-center justify-between gap-3 pb-2 border-b border-border/40">
+              <div className="space-y-1">
+                <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-muted-foreground/80">
                   Estúdio de Criativos com IA
                 </p>
-                <h1 className="text-lg md:text-xl font-semibold mt-1">Chat de imagens</h1>
+                <h1 className="text-lg md:text-2xl font-semibold tracking-tight">
+                  Chat de imagens em tempo real
+                </h1>
               </div>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setUiMode("DASHBOARD")}
+                  className="rounded-full px-3 text-xs md:text-sm"
                 >
                   Voltar para dashboard
                 </Button>
@@ -584,203 +587,209 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background text-foreground flex items-center justify-center">
       <section className="flex-1 flex flex-col px-4 py-6 md:py-10 relative">
-        <div className="absolute top-4 right-4 flex items-center gap-2">
-          <Button 
-            variant="outline" 
+        <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+          <Button
+            variant="outline"
             onClick={() => navigate("/gallery")}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 rounded-full px-3 py-1 text-xs md:text-sm bg-background/80 backdrop-blur-sm border-border/60"
           >
             <Images className="w-4 h-4" />
             Minhas Fotos
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => navigate("/settings")}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 rounded-full px-3 py-1 text-xs md:text-sm bg-background/80 backdrop-blur-sm border-border/60"
           >
             <Clock className="w-4 h-4" />
             Configurações
           </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleLogout}
+            className="rounded-full text-xs md:text-sm"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Sair
           </Button>
         </div>
-        
+
         <div className="w-full max-w-5xl mx-auto flex gap-6 items-start">
           <ConversationsSidebar />
 
-          <div className="flex-1 flex flex-col gap-6 items-center">
-            <div className="flex flex-col items-center gap-2 text-center">
-              <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
+            <div className="flex flex-col items-center gap-3 text-center">
+              <p className="text-xs md:text-sm uppercase tracking-[0.25em] text-muted-foreground/80">
                 Estúdio de Criativos com IA
               </p>
-              <h1 className="text-2xl md:text-3xl font-semibold">Como posso te ajudar hoje?</h1>
+              <h1 className="text-2xl md:text-4xl font-semibold tracking-tight">
+                Como posso te ajudar hoje?
+              </h1>
             </div>
 
-          <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
-            <TabsList className="w-full max-w-xs mx-auto">
-              <TabsTrigger value="dashboard" className="flex-1">
-                Dashboard
-              </TabsTrigger>
-              <TabsTrigger value="chat" className="flex-1">
-                Chat de imagens
-              </TabsTrigger>
-            </TabsList>
+            <Tabs defaultValue="dashboard" className="flex-1 flex flex-col w-full mt-2">
+              <TabsList className="w-full max-w-xs mx-auto rounded-full bg-muted/70 p-1">
+                <TabsTrigger value="dashboard" className="flex-1 rounded-full text-xs md:text-sm">
+                  Dashboard
+                </TabsTrigger>
+                <TabsTrigger value="chat" className="flex-1 rounded-full text-xs md:text-sm">
+                  Chat de imagens
+                </TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="dashboard" className="flex-1">
-              <div className="w-full max-w-3xl space-y-8 mt-4">
-                <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm max-w-3xl mx-auto">
-                  <form
-                    className="flex items-center gap-3"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleImageChat();
-                      setPrompt("");
-                    }}
-                  >
-                    <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
-                      <Plus className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <Textarea
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
-                      className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-                    />
-                    <div className="flex items-center gap-2 shrink-0">
+              <TabsContent value="dashboard" className="flex-1 w-full">
+                <div className="w-full max-w-3xl space-y-8 mt-4">
+                  <Card className="bg-card/80 border-border/60 px-4 py-3 md:px-6 md:py-4 rounded-2xl shadow-sm max-w-3xl mx-auto">
+                    <form
+                      className="flex items-center gap-3 md:gap-4"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        handleImageChat();
+                        setPrompt("");
+                      }}
+                    >
+                      <div className="shrink-0 rounded-full bg-muted w-9 h-9 flex items-center justify-center">
+                        <Plus className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <Textarea
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
+                        className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+                      />
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          className="rounded-full w-9 h-9 flex items-center justify-center bg-muted text-muted-foreground"
+                          aria-label="Microfone (em breve)"
+                        >
+                          <Mic className="w-4 h-4" />
+                        </button>
+                        <Button
+                          type="submit"
+                          size="icon"
+                          className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                          disabled={loadingAd}
+                          aria-label="Gerar anúncio"
+                        >
+                          {loadingAd ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </form>
+                  </Card>
+
+                  <div className="flex flex-col items-center gap-4 text-xs md:text-sm text-muted-foreground text-center">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                      <span className="font-medium text-foreground/80">Ações rápidas:</span>
                       <button
                         type="button"
-                        className="rounded-full w-8 h-8 flex items-center justify-center bg-background/40 text-muted-foreground"
-                        aria-label="Microfone (em breve)"
-                      >
-                        <Mic className="w-4 h-4" />
-                      </button>
-                      <Button
-                        type="submit"
-                        size="icon"
-                        className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                        className="px-3 py-1.5 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors text-xs md:text-sm"
+                        onClick={handleGenerateAd}
                         disabled={loadingAd}
-                        aria-label="Gerar anúncio"
                       >
-                        {loadingAd ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                      </Button>
+                        Gerar anúncio
+                      </button>
+                      <button
+                        type="button"
+                        className="px-3 py-1.5 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors text-xs md:text-sm"
+                        onClick={handleGenerateImages}
+                        disabled={generatingImage || chatLoading}
+                      >
+                        Gerar imagens
+                      </button>
                     </div>
-                  </form>
-                </Card>
 
-                <div className="flex flex-col items-center gap-4 text-xs md:text-sm text-muted-foreground text-center">
-                  <div className="flex flex-wrap items-center justify-center gap-2">
-                    <span className="font-medium text-foreground/80">Ações rápidas:</span>
-                    <button
-                      type="button"
-                      className="px-3 py-1 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors"
-                      onClick={handleGenerateAd}
-                      disabled={loadingAd}
-                    >
-                      Gerar anúncio
-                    </button>
-                    <button
-                      type="button"
-                      className="px-3 py-1 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors"
-                      onClick={handleGenerateImages}
-                      disabled={generatingImage || chatLoading}
-                    >
-                      Gerar imagens
-                    </button>
+                    <div className="flex items-center justify-center gap-2">
+                      <span>Formato da imagem:</span>
+                      <Select value={imageAspect} onValueChange={setImageAspect}>
+                        <SelectTrigger className="h-8 w-40 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1:1">1:1 quadrado</SelectItem>
+                          <SelectItem value="4:5">4:5 feed</SelectItem>
+                          <SelectItem value="9:16">9:16 stories/reels</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-center gap-2">
-                    <span>Formato da imagem:</span>
-                    <Select value={imageAspect} onValueChange={setImageAspect}>
-                      <SelectTrigger className="h-8 w-32 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1:1">1:1 quadrado</SelectItem>
-                        <SelectItem value="4:5">4:5 feed</SelectItem>
-                        <SelectItem value="9:16">9:16 stories/reels</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">Exemplos de prompts de imagem:</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm">
+                      {["Crie a foto de uma mulher mocambicana, 30 anos, cabelo natural preto, sorrindo confiante, em um escritório moderno, iluminação natural, estilo realista, pronta para anúncio em redes sociais.", "Foto de um homem jovem empreendedor, sentado em frente ao notebook em um coworking moderno, estilo lifestyle, luz suave, focado em negócios digitais.", "Imagem de produto cosmético minimalista apoiado em superfície de pedra, fundo desfocado, luz lateral dramática, estilo editorial premium.", "Foto de casal se exercitando ao ar livre ao pôr do sol, clima de conquista e bem-estar, cores quentes, estilo campanha fitness profissional."].map(
+                        (example) => (
+                          <button
+                            key={example}
+                            type="button"
+                            onClick={() => {
+                              setPrompt(example);
+                              generateImagesFromPrompt(example);
+                            }}
+                            className="text-left px-3 py-2 rounded-lg bg-muted/60 hover:bg-muted transition-colors border border-border/40 text-[11px] md:text-xs leading-relaxed"
+                          >
+                            {example}
+                          </button>
+                        ),
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">Exemplos de prompts de imagem:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm">
-                    {["Crie a foto de uma mulher mocambicana, 30 anos, cabelo natural preto, sorrindo confiante, em um escritório moderno, iluminação natural, estilo realista, pronta para anúncio em redes sociais.", "Foto de um homem jovem empreendedor, sentado em frente ao notebook em um coworking moderno, estilo lifestyle, luz suave, focado em negócios digitais.", "Imagem de produto cosmético minimalista apoiado em superfície de pedra, fundo desfocado, luz lateral dramática, estilo editorial premium.", "Foto de casal se exercitando ao ar livre ao pôr do sol, clima de conquista e bem-estar, cores quentes, estilo campanha fitness profissional."].map(
-                      (example) => (
-                        <button
-                          key={example}
-                          type="button"
-                          onClick={() => {
-                            setPrompt(example);
-                            generateImagesFromPrompt(example);
-                          }}
-                          className="text-left px-3 py-2 rounded-lg bg-muted/60 hover:bg-muted transition-colors border border-border/40"
-                        >
-                          {example}
-                        </button>
-                      ),
-                    )}
-                  </div>
-                </div>
-
-                {chatMessages.length > 0 && (
-                  <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col h-[60vh]">
-                    <h2 className="text-sm font-medium">Assistente de imagem</h2>
-                    <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-                      {chatMessages.map((msg, index) => (
-                        <div
-                          key={index}
-                          className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${
-                            msg.role === "user" ? "ml-auto" : "mr-auto"
-                          }`}
-                        >
-                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                            {msg.role === "user" ? "Você" : "IA"}
-                          </span>
-                          {msg.content && <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>}
-                          {msg.imageUrl && (
-                            <div className="space-y-2">
-                              <div className="overflow-hidden rounded-lg border bg-background">
-                                <img
-                                  src={msg.imageUrl}
-                                  alt="Imagem gerada pela IA"
-                                  className="w-full h-auto object-cover"
-                                  loading="lazy"
-                                />
+                  {chatMessages.length > 0 && (
+                    <Card className="bg-card/80 border-border/60 p-4 md:p-5 space-y-3 flex flex-col h-[60vh] rounded-2xl shadow-sm">
+                      <h2 className="text-sm md:text-base font-medium flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        Assistente de imagem
+                      </h2>
+                      <div className="space-y-3 flex-1 overflow-y-auto pr-1">
+                        {chatMessages.map((msg, index) => (
+                          <div
+                            key={index}
+                            className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm border border-border/40 bg-background/70 flex flex-col gap-2 hover-scale transition-transform ${
+                              msg.role === "user" ? "ml-auto" : "mr-auto"
+                            }`}
+                          >
+                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                              {msg.role === "user" ? "Você" : "IA"}
+                            </span>
+                            {msg.content && <p className="whitespace-pre-wrap leading-relaxed text-sm md:text-[15px]">{msg.content}</p>}
+                            {msg.imageUrl && (
+                              <div className="space-y-2">
+                                <div className="overflow-hidden rounded-xl border bg-background">
+                                  <img
+                                    src={msg.imageUrl}
+                                    alt="Imagem gerada pela IA"
+                                    className="w-full h-auto object-cover"
+                                    loading="lazy"
+                                  />
+                                </div>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full text-xs md:text-sm rounded-full"
+                                  onClick={() => {
+                                    const a = document.createElement("a");
+                                    a.href = msg.imageUrl!;
+                                    a.download = "imagem-gerada.png";
+                                    a.click();
+                                  }}
+                                >
+                                  Baixar imagem
+                                </Button>
                               </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                                onClick={() => {
-                                  const a = document.createElement("a");
-                                  a.href = msg.imageUrl!;
-                                  a.download = "imagem-gerada.png";
-                                  a.click();
-                                }}
-                              >
-                                Baixar imagem
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    {chatLoading && (
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        Pensando na melhor forma de gerar sua imagem...
-                      </p>
-                    )}
-                  </Card>
-                )}
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      {chatLoading && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Pensando na melhor forma de gerar sua imagem...
+                        </p>
+                      )}
+                    </Card>
+                  )}
 
                 {adContent && (
                   <section className="space-y-6">
