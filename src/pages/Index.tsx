@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Sparkles, Copy, CheckCircle2, Video } from "lucide-react";
+import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import VideoPlayer from "@/components/VideoPlayer";
@@ -45,6 +45,13 @@ const Index = () => {
   // Generated content
   const [adContent, setAdContent] = useState<AdContent | null>(null);
   const [videoFrames, setVideoFrames] = useState<VideoFrames | null>(null);
+  const [imagePrompt, setImagePrompt] = useState("");
+  const [imageAspect, setImageAspect] = useState("9:16");
+  const [imageResult, setImageResult] = useState<{
+    natural: string;
+    corporate: string;
+  } | null>(null);
+  const [generatingImage, setGeneratingImage] = useState(false);
 
   const handleGenerate = async () => {
     if (!productName || !targetAudience || !mainBenefit) {
@@ -362,8 +369,162 @@ const Index = () => {
         )}
 
         {videoFrames && (
-          <VideoPlayer frames={videoFrames} script={adContent.script} />
+          <VideoPlayer frames={videoFrames} script={adContent!.script} />
         )}
+
+        {/* Image generator */}
+        <Card className="p-6 border-2 border-secondary/30 bg-gradient-to-br from-background to-muted/40">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <h3 className="font-bold text-lg flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5 text-primary" />
+                  Gerar Imagem Profissional
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Digite um prompt e gere duas versões: natural (UGC) e profissional.
+                </p>
+              </div>
+              <div className="w-full sm:w-auto">
+                <Label htmlFor="aspect" className="text-xs font-medium text-muted-foreground">
+                  Formato
+                </Label>
+                <Select value={imageAspect} onValueChange={setImageAspect}>
+                  <SelectTrigger id="aspect" className="mt-1 w-full sm:w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1:1">1:1 (quadrado)</SelectItem>
+                    <SelectItem value="4:5">4:5 (feed)</SelectItem>
+                    <SelectItem value="9:16">9:16 (stories/reels)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Textarea
+                value={imagePrompt}
+                onChange={(e) => setImagePrompt(e.target.value)}
+                placeholder="Ex: Crie a foto de uma mulher mocambicana, 30 anos, cabelo natural preto, sorrindo confiante, em um escritório moderno, iluminação natural, estilo realista."
+                className="min-h-24"
+              />
+              <Button
+                onClick={async () => {
+                  if (!imagePrompt.trim()) {
+                    toast({
+                      title: "Digite um prompt",
+                      description: "Descreva a imagem que deseja gerar",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
+                  try {
+                    setGeneratingImage(true);
+                    toast({
+                      title: "Gerando imagens...",
+                      description: "Criando versões natural e profissional para o seu prompt.",
+                    });
+
+                    const { data, error } = await supabase.functions.invoke("generate-image", {
+                      body: {
+                        prompt: imagePrompt,
+                        aspectRatio: imageAspect,
+                      },
+                    });
+
+                    if (error) throw error;
+                    if (data?.error) throw new Error(data.error);
+
+                    setImageResult(data.images);
+                    toast({
+                      title: "Imagens geradas!",
+                      description: "Duas versões prontas para uso profissional.",
+                    });
+                  } catch (err) {
+                    console.error("Error generating image:", err);
+                    toast({
+                      title: "Erro ao gerar imagens",
+                      description:
+                        err instanceof Error ? err.message : "Tente novamente em alguns instantes.",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setGeneratingImage(false);
+                  }
+                }}
+                disabled={generatingImage}
+                className="w-full sm:w-auto px-6"
+              >
+                {generatingImage ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Gerando...
+                  </>
+                ) : (
+                  <>
+                    <ImageIcon className="mr-2 h-4 w-4" />
+                    Gerar Imagens com IA
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {imageResult && (
+              <div className="grid gap-4 md:grid-cols-2 mt-4">
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm">Versão Natural (UGC)</h4>
+                  <div className="overflow-hidden rounded-lg border bg-background">
+                    <img
+                      src={imageResult.natural}
+                      alt="Imagem gerada - estilo natural UGC"
+                      className="w-full h-auto object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      const a = document.createElement("a");
+                      a.href = imageResult.natural;
+                      a.download = "imagem-natural.png";
+                      a.click();
+                    }}
+                  >
+                    Baixar versão natural
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm">Versão Profissional / Corporativa</h4>
+                  <div className="overflow-hidden rounded-lg border bg-background">
+                    <img
+                      src={imageResult.corporate}
+                      alt="Imagem gerada - estilo profissional corporativo"
+                      className="w-full h-auto object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      const a = document.createElement("a");
+                      a.href = imageResult.corporate;
+                      a.download = "imagem-profissional.png";
+                      a.click();
+                    }}
+                  >
+                    Baixar versão profissional
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
+
         {/* Hook */}
         <Card className="p-6 border-2 border-primary/20">
           <div className="flex items-start justify-between mb-3">
