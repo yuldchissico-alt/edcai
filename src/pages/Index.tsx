@@ -302,7 +302,7 @@ const Index = () => {
             {chatLoading && (
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
                 <Loader2 className="w-3 h-3 animate-spin" />
-                Pensando na melhor forma de gerar sua imagem...
+                IA está digitando...
               </p>
             )}
           </Card>
