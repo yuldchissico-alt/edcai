@@ -426,13 +426,13 @@ const Index = () => {
 
   if (uiMode === "CHAT") {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/60 text-foreground flex items-center justify-center px-4 py-6 md:py-10">
+      <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/60 text-foreground flex items-start md:items-center justify-center px-4 py-6 md:py-10">
         <section className="w-full max-w-5xl mx-auto flex justify-center h-full max-h-[90vh]">
           <ConversationsSidebar />
 
           <div className="flex-1 flex flex-col gap-5 animate-fade-in">
-            <header className="flex items-center justify-between gap-3 pb-2 border-b border-border/40">
-              <div className="space-y-1">
+            <header className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-border/40">
+              <div className="space-y-1 min-w-[220px] flex-1">
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-muted-foreground/80">
                   Estúdio de Criativos com IA
                 </p>
@@ -440,7 +440,7 @@ const Index = () => {
                   Chat de imagens em tempo real
                 </h1>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 justify-end">
                 <Button
                   variant="outline"
                   size="sm"
@@ -619,7 +619,7 @@ const Index = () => {
                 <div className="w-full max-w-3xl space-y-8 mt-4 mx-auto">
                   <Card className="bg-card/80 border-border/60 px-4 py-3 md:px-6 md:py-4 rounded-2xl shadow-sm max-w-3xl mx-auto">
                     <form
-                      className="flex items-center gap-3 md:gap-4"
+                      className="flex flex-col md:flex-row items-stretch md:items-center gap-3 md:gap-4"
                       onSubmit={(e) => {
                         e.preventDefault();
                         handleImageChat();
@@ -633,9 +633,9 @@ const Index = () => {
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Ex: Crie um vídeo curto para TikTok vendendo meu curso de marketing para infoprodutores..."
-                        className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="border-none bg-transparent resize-none min-h-16 max-h-32 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
                       />
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center justify-end gap-2 shrink-0">
                         <button
                           type="button"
                           className="rounded-full w-9 h-9 flex items-center justify-center bg-muted text-muted-foreground"
@@ -872,7 +872,7 @@ const Index = () => {
 
                   <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
                     <form
-                      className="flex items-center gap-3"
+                      className="flex flex-col md:flex-row items-stretch md:items-center gap-3"
                       onSubmit={(e) => {
                         e.preventDefault();
                         handleImageChat();
@@ -885,9 +885,9 @@ const Index = () => {
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="Descreva a imagem que quer gerar..."
-                        className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="border-none bg-transparent resize-none min-h-16 max-h-32 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
                       />
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center justify-end gap-2 shrink-0">
                         <Button
                           type="submit"
                           size="icon"
