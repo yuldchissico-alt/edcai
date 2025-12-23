@@ -270,7 +270,7 @@ const Index = () => {
           </div>
 
           <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
-            <TabsList className="w-full max-w-xs">
+            <TabsList className="w-full max-w-xs mx-auto">
               <TabsTrigger value="dashboard" className="flex-1">
                 Dashboard
               </TabsTrigger>
