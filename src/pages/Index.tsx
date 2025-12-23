@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic, LogOut, Images, Clock } from "lucide-react";
+import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic, LogOut, Images, Clock, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -50,6 +50,7 @@ const Index = () => {
   const [uiMode, setUiMode] = useState<"DASHBOARD" | "CHAT">("DASHBOARD");
   const [conversations, setConversations] = useState<Tables<"conversations">[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [isConversationsOpen, setIsConversationsOpen] = useState(true);
 
   const fetchConversations = useCallback(async (userId: string) => {
     const { data, error } = await supabase
@@ -380,50 +381,69 @@ const Index = () => {
 
   const ConversationsSidebar = () => (
     <aside className="hidden md:flex w-64 flex-col gap-3 border-r border-border/40 pr-3">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Conversas</span>
-        <Button
-          size="icon"
-          variant="outline"
-          className="h-7 w-7"
-          onClick={handleNewConversation}
-          title="Nova conversa"
-        >
-          <Plus className="w-3 h-3" />
-        </Button>
-      </div>
-      <div className="flex-1 overflow-y-auto space-y-2">
-        {conversations.length === 0 ? (
-          <p className="text-xs text-muted-foreground">Nenhuma conversa ainda.</p>
-        ) : (
-          conversations.map((conversation) => (
-            <button
-              key={conversation.id as string}
-              type="button"
-              onClick={() => handleSelectConversation(conversation.id as string)}
-              className={`w-full text-left rounded-lg border px-3 py-2 text-xs transition-colors ${
-                conversation.id === currentConversationId
-                  ? "bg-primary/10 border-primary/60"
-                  : "bg-muted/40 border-border/40 hover:bg-muted/70"
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-medium line-clamp-1">
-                  {conversation.title || "Conversa sem título"}
-                </span>
-              </div>
-              <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
-                <Clock className="w-3 h-3" />
-                <span>
-                  {conversation.updated_at
-                    ? new Date(conversation.updated_at as string).toLocaleString("pt-BR")
-                    : ""}
-                </span>
-              </div>
-            </button>
-          ))
-        )}
-      </div>
+      <button
+        type="button"
+        className="flex items-center justify-between gap-2 text-left w-full group"
+        onClick={() => setIsConversationsOpen((prev) => !prev)}
+      >
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Conversas antigas
+        </span>
+        <div className="flex items-center gap-1">
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-7 w-7"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNewConversation();
+            }}
+            title="Nova conversa"
+          >
+            <Plus className="w-3 h-3" />
+          </Button>
+          <ChevronDown
+            className={`w-3 h-3 transition-transform duration-200 text-muted-foreground ${
+              isConversationsOpen ? "rotate-0" : "-rotate-90"
+            }`}
+          />
+        </div>
+      </button>
+
+      {isConversationsOpen && (
+        <div className="flex-1 overflow-y-auto space-y-2 mt-2">
+          {conversations.length === 0 ? (
+            <p className="text-xs text-muted-foreground">Nenhuma conversa ainda.</p>
+          ) : (
+            conversations.map((conversation) => (
+              <button
+                key={conversation.id as string}
+                type="button"
+                onClick={() => handleSelectConversation(conversation.id as string)}
+                className={`w-full text-left rounded-lg border px-3 py-2 text-xs transition-colors ${
+                  conversation.id === currentConversationId
+                    ? "bg-primary/10 border-primary/60"
+                    : "bg-muted/40 border-border/40 hover:bg-muted/70"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium line-clamp-1">
+                    {conversation.title || "Conversa sem título"}
+                  </span>
+                </div>
+                <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
+                  <Clock className="w-3 h-3" />
+                  <span>
+                    {conversation.updated_at
+                      ? new Date(conversation.updated_at as string).toLocaleString("pt-BR")
+                      : ""}
+                  </span>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      )}
     </aside>
   );
 
