@@ -260,7 +260,7 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col">
-      <section className="flex-1 flex flex-col items-center px-4 py-6 md:py-10">
+      <section className="flex-1 flex flex-col items-center justify-center px-4 py-6 md:py-10">
         <div className="w-full max-w-5xl flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2 text-center">
             <p className="text-xs md:text-sm uppercase tracking-[0.2em] text-muted-foreground">
