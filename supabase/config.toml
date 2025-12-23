@@ -1,1 +1,7 @@
 project_id = "tzhocqdaalbgdagwsydn"
+
+[functions.generate-image]
+verify_jwt = false
+
+[functions.image-chat-assistant]
+verify_jwt = false
