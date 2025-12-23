@@ -259,7 +259,9 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col">
-      <section className="flex-1 flex flex-col items-center justify-center px-4 py-16">
+      <section
+        className={`flex-1 flex flex-col items-center px-4 py-16 ${chatMessages.length > 0 ? "justify-start" : "justify-center"}`}
+      >
         <div className="w-full max-w-3xl space-y-8">
           <div className="text-center space-y-3">
             <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
@@ -377,9 +379,9 @@ const Index = () => {
           </div>
 
           {chatMessages.length > 0 && (
-            <Card className="bg-muted/40 border-border/60 p-4 space-y-3">
+            <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col h-[60vh]">
               <h2 className="text-sm font-medium">Assistente de imagem</h2>
-              <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+              <div className="space-y-3 flex-1 overflow-y-auto pr-1">
                 {chatMessages.map((msg, index) => (
                   <div
                     key={index}
