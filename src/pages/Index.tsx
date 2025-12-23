@@ -177,10 +177,6 @@ const Index = () => {
       if (data?.error) throw new Error(data.error);
 
       setImageResult(data.image as string);
-      toast({
-        title: "Imagem gerada!",
-        description: "Criativo pronto para uso profissional.",
-      });
     } catch (err) {
       console.error("Error generating image:", err);
       toast({
