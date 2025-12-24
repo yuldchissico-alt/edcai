@@ -48,7 +48,7 @@ ${prompt}`;
     const modelName =
       typeof model === "string" && model.trim().length > 0
         ? model
-        : "imagen-3.0-generate-002";
+        : "imagen-4.0-generate-001";
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`;
 
