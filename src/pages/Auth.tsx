@@ -23,7 +23,7 @@ export default function Auth() {
     // Verifica se já está logado
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        navigate("/app");
       }
     });
   }, [navigate]);
@@ -47,18 +47,18 @@ export default function Auth() {
         });
         if (error) throw error;
         toast.success("Login realizado com sucesso!");
-        navigate("/");
+        navigate("/app");
       } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}/app`,
           },
         });
         if (error) throw error;
         toast.success("Conta criada com sucesso!");
-        navigate("/");
+        navigate("/app");
       }
     } catch (error: any) {
       if (error.message.includes("already registered")) {
