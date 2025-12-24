@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic, LogOut, Images, Clock, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import type { User } from "@supabase/supabase-js";
