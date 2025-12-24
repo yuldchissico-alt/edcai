@@ -555,8 +555,8 @@ const Index = () => {
         <div className="w-full flex flex-col lg:flex-row gap-6 items-stretch lg:items-start mt-10 md:mt-12">
            <ConversationsSidebar />
  
--          <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
-+          <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
+<div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
+{/* layout fixed */}
              <div className="flex flex-col items-center gap-3 text-center">
 
               <p className="text-xs md:text-sm uppercase tracking-[0.25em] text-muted-foreground/80">
