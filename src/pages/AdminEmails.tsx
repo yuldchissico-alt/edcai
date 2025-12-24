@@ -16,6 +16,7 @@ const AdminEmails = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [filter, setFilter] = useState<"all" | "today">("all");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,16 +97,26 @@ const AdminEmails = () => {
   return (
     <div className="min-h-screen bg-background px-4 py-8 flex justify-center">
       <div className="w-full max-w-3xl space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">E-mails cadastrados</h1>
             <p className="text-muted-foreground text-sm">
-              Lista de todos os usuários que já criaram conta no Estúdio de Criativos.
+              Lista de usuários que já criaram conta no Estúdio de Criativos.
             </p>
           </div>
-          <Button variant="outline" onClick={() => navigate("/app")}>
-            Voltar
-          </Button>
+          <div className="flex items-center gap-2">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as "all" | "today")}
+              className="border border-input bg-background text-sm rounded-md px-3 py-1.5 text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="all">Todos</option>
+              <option value="today">Hoje</option>
+            </select>
+            <Button variant="outline" onClick={() => navigate("/app")}>
+              Voltar
+            </Button>
+          </div>
         </div>
 
         <Card className="overflow-hidden">
@@ -117,14 +128,25 @@ const AdminEmails = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {profiles.map((profile) => (
-                <TableRow key={profile.id}>
-                  <TableCell>{profile.email}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {new Date(profile.created_at).toLocaleString("pt-PT")}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {profiles
+                .filter((profile) => {
+                  if (filter === "all") return true;
+                  const created = new Date(profile.created_at);
+                  const now = new Date();
+                  return (
+                    created.getFullYear() === now.getFullYear() &&
+                    created.getMonth() === now.getMonth() &&
+                    created.getDate() === now.getDate()
+                  );
+                })
+                .map((profile) => (
+                  <TableRow key={profile.id}>
+                    <TableCell>{profile.email}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(profile.created_at).toLocaleString("pt-PT")}
+                    </TableCell>
+                  </TableRow>
+                ))}
               {profiles.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={2} className="text-center text-muted-foreground text-sm py-6">
