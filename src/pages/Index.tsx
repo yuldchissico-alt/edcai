@@ -519,9 +519,8 @@ const Index = () => {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex items-stretch justify-center px-4 py-4 md:px-6 md:py-8">
+    <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-4 md:px-6 md:py-8">
       <section className="w-full max-w-6xl mx-auto flex flex-col relative">
-
         <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
           <Button
             variant="outline"
@@ -552,7 +551,7 @@ const Index = () => {
           </Button>
         </div>
 
-        <div className="w-full flex flex-col lg:flex-row gap-6 items-center lg:items-start mt-10 md:mt-12">
+        <div className="w-full flex flex-col lg:flex-row gap-6 items-center lg:items-start">
           <ConversationsSidebar />
 
           <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
