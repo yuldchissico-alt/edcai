@@ -49,27 +49,27 @@ const Landing = () => {
         </nav>
       </header>
 
-      <section className="max-w-6xl mx-auto px-4 pb-16 pt-6 grid gap-10 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] items-center">
-        <div className="space-y-6">
+      <section className="max-w-3xl mx-auto px-4 pb-16 pt-10 space-y-10 text-center">
+        <div className="space-y-5">
           <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
             Landing Page
           </p>
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight">
             Crie criativos de anúncios em minutos usando IA, texto e imagens.
           </h1>
-          <p className="text-sm md:text-base text-muted-foreground max-w-xl">
+          <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
             Gere roteiros, imagens e variações de criativos para campanhas em Meta, TikTok e outras
             plataformas. Tudo em um único estúdio, conectado ao seu fluxo de trabalho.
           </p>
 
-          <div className="flex flex-wrap gap-3 items-center">
+          <div className="flex flex-wrap justify-center gap-3 items-center">
             <Button size="lg" onClick={() => navigate("/auth")}>
               Acessar estúdio completo
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
 
-          <div className="flex flex-wrap gap-4 pt-4 text-xs text-muted-foreground">
+          <div className="flex flex-wrap justify-center gap-4 pt-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
                 <Video className="w-3 h-3 text-primary" />
@@ -85,27 +85,27 @@ const Landing = () => {
           </div>
         </div>
 
-        <Card className="bg-card/80 border-border/60 p-5 md:p-6 shadow-lg shadow-primary/10">
+        <Card className="bg-card/80 border-border/40 p-6 md:p-7">
           <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground mb-3">
             Prévia do estúdio
           </p>
           <div className="space-y-4 text-sm text-muted-foreground">
             <div className="space-y-2">
               <p className="font-medium text-foreground text-sm">Prompt de exemplo</p>
-              <p className="bg-muted/70 rounded-lg p-3 border border-border/60 text-xs leading-relaxed">
+              <p className="bg-muted/60 rounded-lg p-3 border border-border/40 text-xs leading-relaxed text-left">
                 "Crie um anúncio em vídeo de 30s para um curso online de tráfego pago, focado em
                 resultados rápidos para pequenos negócios."
               </p>
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 pt-2">
-              <div className="rounded-lg border border-border/60 bg-background/60 p-3 space-y-2">
+              <div className="rounded-lg border border-border/50 bg-background/60 p-3 space-y-2 text-left">
                 <p className="text-xs font-medium text-foreground">Geração de roteiro</p>
                 <p className="text-[11px] leading-relaxed">
                   A IA cria o gancho, 3 cenas e CTA pronto para colar no gerenciador de anúncios.
                 </p>
               </div>
-              <div className="rounded-lg border border-border/60 bg-background/60 p-3 space-y-2">
+              <div className="rounded-lg border border-border/50 bg-background/60 p-3 space-y-2 text-left">
                 <p className="text-xs font-medium text-foreground">Imagens e variações</p>
                 <p className="text-[11px] leading-relaxed">
                   Gere imagens verticais e quadradas prontas para testes A/B em campanhas.
@@ -113,7 +113,7 @@ const Landing = () => {
               </div>
             </div>
 
-            <div className="mt-2 text-[11px] text-muted-foreground/90">
+            <div className="mt-2 text-[11px] text-muted-foreground/90 text-left">
               Nenhum cartão de crédito é necessário para começar. Faça login, teste o estúdio e conecte
               suas campanhas quando estiver pronto.
             </div>
@@ -121,7 +121,7 @@ const Landing = () => {
         </Card>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 pb-20 space-y-6">
+      <section className="max-w-3xl mx-auto px-4 pb-20 space-y-6">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div className="space-y-2 max-w-xl">
             <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
@@ -199,7 +199,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 pb-16 pt-6 space-y-8">
+      <section className="max-w-3xl mx-auto px-4 pb-16 pt-6 space-y-8">
         <div className="space-y-2 max-w-2xl">
           <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
             Como o estúdio funciona
@@ -239,7 +239,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-4 pb-20 space-y-6">
+      <section className="max-w-3xl mx-auto px-4 pb-20 space-y-6">
         <div className="space-y-2 text-center">
           <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
             Perguntas rápidas
