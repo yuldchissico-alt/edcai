@@ -388,21 +388,21 @@ const Index = () => {
           <ConversationsSidebar />
 
           <div className="flex-1 flex flex-col gap-5 animate-fade-in">
-            <header className="flex items-center justify-between gap-3 pb-2 border-b border-border/40">
-              <div className="space-y-1">
+            <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-border/40">
+              <div className="space-y-1 min-w-0">
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-muted-foreground/80">
                   Estúdio de Criativos com IA
                 </p>
-                <h1 className="text-base sm:text-lg md:text-2xl font-semibold tracking-tight leading-snug">
+                <h1 className="text-base sm:text-lg md:text-2xl font-semibold tracking-tight leading-snug break-words">
                   Chat de imagens em tempo real
                 </h1>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap sm:flex-nowrap items-center justify-start sm:justify-end gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setUiMode("DASHBOARD")}
-                  className="rounded-full px-3 text-xs md:text-sm"
+                  className="rounded-full px-3 text-xs md:text-sm w-full sm:w-auto justify-center"
                 >
                   Voltar para dashboard
                 </Button>
