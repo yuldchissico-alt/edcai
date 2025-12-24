@@ -61,8 +61,8 @@ const Landing = () => {
             Crie imagens de anúncios em minutos usando IA.
           </h1>
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
-            Gere imagens ultra realistas e prontas para campanhas em Meta, TikTok e outras plataformas.
-            Tudo em um único estúdio focado em criativos de alta performance.
+            Gere fotos e imagens ultra realistas em poucos cliques.
+            Tudo em um único estúdio de criação visual com IA.
           </p>
 
           <div className="flex flex-wrap justify-center gap-3 items-center">
@@ -96,8 +96,8 @@ const Landing = () => {
             <div className="space-y-2">
               <p className="font-medium text-foreground text-sm">Prompt de exemplo</p>
               <p className="bg-muted/60 rounded-lg p-3 border border-border/40 text-xs leading-relaxed text-left">
-                "Crie uma imagem para anúncio no Instagram mostrando uma mulher empreendedora em um escritório
-                moderno, com atmosfera profissional e cores que remetam a confiança."
+                "Crie uma foto em estilo realista mostrando uma mulher empreendedora em um escritório moderno,
+                com atmosfera profissional e cores que remetam a confiança."
               </p>
             </div>
 
@@ -105,20 +105,20 @@ const Landing = () => {
               <div className="rounded-lg border border-border/50 bg-background/60 p-3 space-y-2 text-left">
                 <p className="text-xs font-medium text-foreground">Briefing inteligente</p>
                 <p className="text-[11px] leading-relaxed">
-                  A IA entende seu contexto de campanha e transforma em um briefing visual claro para gerar imagens.
+                  A IA entende a sua descrição simples e transforma em um briefing visual claro para gerar imagens.
                 </p>
               </div>
               <div className="rounded-lg border border-border/50 bg-background/60 p-3 space-y-2 text-left">
                 <p className="text-xs font-medium text-foreground">Imagens e variações</p>
                 <p className="text-[11px] leading-relaxed">
-                  Gere imagens verticais e quadradas prontas para testes A/B em campanhas.
+                  Gere fotos em diferentes formatos (quadrado, vertical, horizontal) para usar onde quiser.
                 </p>
               </div>
             </div>
 
             <div className="mt-2 text-[11px] text-muted-foreground/90 text-left">
-              Nenhum cartão de crédito é necessário para começar. Faça login, teste o estúdio e conecte
-              suas campanhas quando estiver pronto.
+              Nenhum cartão de crédito é necessário para começar. Faça login e teste a criação de fotos com IA
+              no seu próprio tempo.
             </div>
           </div>
         </Card>
@@ -131,10 +131,10 @@ const Landing = () => {
               Planos pensados para criativos
             </p>
             <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-              Comece grátis e evolua conforme suas campanhas escalam.
+              Comece grátis e evolua conforme cria mais fotos com IA.
             </h2>
             <p className="text-sm md:text-base text-muted-foreground">
-              Do primeiro criativo de teste ao fluxo semanal de lançamentos, escolha um plano que acompanha o seu ritmo.
+              Do seu primeiro teste até uma biblioteca completa de imagens, escolha um plano que acompanha o seu ritmo.
             </p>
           </div>
 
@@ -158,7 +158,7 @@ const Landing = () => {
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground flex-1">
-              Para quem está começando a testar criativos com IA em campanhas pequenas.
+              Para quem está começando a testar criação de fotos com IA.
             </p>
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-xl">R$ 0</p>
@@ -176,7 +176,7 @@ const Landing = () => {
               </h3>
             </div>
             <p className="text-sm text-muted-foreground flex-1">
-              Para gestores de tráfego que precisam testar criativos semanalmente em várias contas.
+              Para quem precisa produzir imagens novas com frequência sem depender de bancos de imagem.
             </p>
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-xl">R$ 97/mês</p>
@@ -192,7 +192,7 @@ const Landing = () => {
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground flex-1">
-              Para times que gerenciam múltiplos clientes e precisam padronizar a criação de criativos.
+              Para times que precisam padronizar a criação de fotos e visuais em vários projetos.
             </p>
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-xl">R$ 297/mês</p>
@@ -208,19 +208,19 @@ const Landing = () => {
             Como o estúdio funciona
           </p>
           <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-            Do briefing da campanha à imagem aprovada em três passos.
+            Da ideia à foto final em três passos.
           </h2>
           <p className="text-sm md:text-base text-muted-foreground">
-            Use prompts simples, refine com a IA e gere imagens prontas para subir direto nas campanhas.
+            Use prompts simples, refine com a IA e gere imagens prontas para usar em qualquer lugar.
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="bg-background/60 border-border/60 p-4 space-y-2">
             <p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">Passo 1</p>
-            <h3 className="text-base font-semibold">Defina o contexto da campanha</h3>
+            <h3 className="text-base font-semibold">Descreva o que quer ver</h3>
             <p className="text-sm text-muted-foreground">
-              Informe produto, público, oferta e plataforma (Meta, TikTok, YouTube) em linguagem simples.
+              Informe quem aparece, o ambiente, o clima da foto e o estilo desejado em linguagem simples.
             </p>
           </Card>
 
@@ -234,9 +234,9 @@ const Landing = () => {
 
           <Card className="bg-background/60 border-border/60 p-4 space-y-2">
             <p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">Passo 3</p>
-            <h3 className="text-base font-semibold">Gere, baixe e teste</h3>
+            <h3 className="text-base font-semibold">Gere, baixe e use</h3>
             <p className="text-sm text-muted-foreground">
-              Gere imagens em diferentes proporções, baixe os arquivos e teste variações nas campanhas.
+              Gere imagens em diferentes proporções, baixe os arquivos e use em posts, capas, apresentações e mais.
             </p>
           </Card>
         </div>
