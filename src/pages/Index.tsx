@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,7 +36,6 @@ const Index = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
-  const { isRecording, isTranscribing, startRecording, stopRecording } = useVoiceRecording();
   
   const [prompt, setPrompt] = useState("");
   const [loadingAd, setLoadingAd] = useState(false);
@@ -52,6 +51,8 @@ const Index = () => {
   const [conversations, setConversations] = useState<Tables<"conversations">[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [isConversationsOpen, setIsConversationsOpen] = useState(true);
+  const [processingFile, setProcessingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const fetchConversations = useCallback(async (userId: string) => {
     const { data, error } = await supabase
@@ -297,8 +298,81 @@ const Index = () => {
       setGeneratingImage(false);
     }
   };
-  const handleImageChat = async (initialPrompt?: string) => {
-    const messageContent = (initialPrompt ?? prompt).trim();
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      setProcessingFile(true);
+
+      if (file.type.startsWith("audio/")) {
+        const formData = new FormData();
+        formData.append("audio", file, file.name || "audio-file");
+
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-transcribe`,
+          {
+            method: "POST",
+            headers: {
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            },
+            body: formData,
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Erro ao transcrever áudio");
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        const transcribedText = (data.text as string | undefined)?.trim();
+
+        if (!transcribedText) {
+          toast({
+            title: "Nenhum texto encontrado",
+            description: "Não foi possível extrair texto deste áudio.",
+            variant: "destructive",
+          });
+        } else {
+          setPrompt(transcribedText);
+          await generateImagesFromPrompt(transcribedText);
+        }
+      } else if (file.type.startsWith("image/")) {
+        toast({
+          title: "Imagem selecionada",
+          description: "Imagem adicionada como referência. Descreva no prompt como deseja usá-la.",
+        });
+      } else {
+        toast({
+          title: "Tipo de arquivo não suportado",
+          description: "Selecione apenas imagens ou áudios.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao processar arquivo:", error);
+      toast({
+        title: "Erro ao processar arquivo",
+        description: "Não foi possível processar o arquivo selecionado.",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingFile(false);
+      event.target.value = "";
+    }
+  };
+
+
     if (!messageContent) {
       toast({
         title: "Digite um prompt",
@@ -594,40 +668,24 @@ const Index = () => {
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           type="button"
-                          className={`rounded-full w-9 h-9 flex items-center justify-center transition-colors ${
-                            isRecording
-                              ? "bg-destructive text-destructive-foreground animate-pulse"
-                              : "bg-muted text-muted-foreground hover:bg-muted/80"
-                          }`}
-                          aria-label={isRecording ? "Gravando..." : "Gravar voz"}
-                          onMouseDown={async () => {
-                            await startRecording();
-                          }}
-                          onMouseUp={async () => {
-                            const transcribedText = await stopRecording();
-                            if (transcribedText) {
-                              setPrompt(transcribedText);
-                              await generateImagesFromPrompt(transcribedText);
-                            }
-                          }}
-                          onTouchStart={async () => {
-                            await startRecording();
-                          }}
-                          onTouchEnd={async () => {
-                            const transcribedText = await stopRecording();
-                            if (transcribedText) {
-                              setPrompt(transcribedText);
-                              await generateImagesFromPrompt(transcribedText);
-                            }
-                          }}
-                          disabled={isTranscribing}
+                          className="rounded-full w-9 h-9 flex items-center justify-center transition-colors bg-muted text-muted-foreground hover:bg-muted/80 disabled:opacity-60"
+                          aria-label="Selecionar arquivo de imagem ou áudio"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={processingFile}
                         >
-                          {isTranscribing ? (
+                          {processingFile ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
-                            <Mic className="w-4 h-4" />
+                            <Plus className="w-4 h-4" />
                           )}
                         </button>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*,audio/*"
+                          className="hidden"
+                          onChange={handleFileChange}
+                        />
                         <Button
                           type="submit"
                           size="icon"
