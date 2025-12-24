@@ -619,42 +619,6 @@ const Index = () => {
                     </form>
                   </Card>
 
-                  <div className="flex flex-col items-center gap-4 text-xs md:text-sm text-muted-foreground text-center">
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                      <span className="font-medium text-foreground/80">Ações rápidas:</span>
-                      <button
-                        type="button"
-                        className="px-3 py-1.5 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors text-xs md:text-sm"
-                        onClick={handleGenerateAd}
-                        disabled={loadingAd}
-                      >
-                        Gerar anúncio
-                      </button>
-                      <button
-                        type="button"
-                        className="px-3 py-1.5 rounded-full bg-muted text-foreground/80 hover:bg-muted/80 transition-colors text-xs md:text-sm"
-                        onClick={handleGenerateImages}
-                        disabled={generatingImage || chatLoading}
-                      >
-                        Gerar imagens
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-center gap-2">
-                      <span>Formato da imagem:</span>
-                      <Select value={imageAspect} onValueChange={setImageAspect}>
-                        <SelectTrigger className="h-8 w-40 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1:1">1:1 quadrado</SelectItem>
-                          <SelectItem value="4:5">4:5 feed</SelectItem>
-                          <SelectItem value="9:16">9:16 stories/reels</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
                   <div className="space-y-2">
                     <p className="text-xs text-muted-foreground">Exemplos de prompts de imagem:</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm">
