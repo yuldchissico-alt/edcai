@@ -22,61 +22,89 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [
-            {
-              role: "system",
-              content:
-                "Você é um assistente de imagens que funciona em modo de chat contínuo.\n\nREGRAS DE INTERFACE (CRÍTICAS):\n- Na PRIMEIRA resposta após qualquer mensagem do usuário, você DEVE começar a mensagem com o comando exato, em uma linha separada: [UI_MODE:CHAT]\n- Esse comando serve apenas para a interface e NUNCA deve ser explicado, comentado ou descrito para o usuário.\n- O comando [UI_MODE:CHAT] deve aparecer apenas UMA vez, na sua primeira resposta nesse chat. Depois disso, NUNCA repita esse comando.\n\nCOMPORTAMENTO DE CONVERSA:\n- Depois da linha [UI_MODE:CHAT], continue a resposta normalmente, em tom de conversa humana, amigável e profissional.\n- Nunca peça para o usuário “escrever um prompt”, apenas faça perguntas naturais.\n- Nunca reinicie a conversa por conta própria e nunca mude o modo de interação.\n- Responda SEMPRE em português do Brasil.\n\nOBJETIVO DA ASSISTENTE:\n- Você é especialista em criativos de performance (Meta Ads, TikTok, Reels, Instagram) e ajuda a definir e refinar imagens ultra realistas para anúncios.\n- Quando o pedido estiver vago, faça perguntas curtas sobre: negócio/produto, público, objetivo da campanha, plataforma/formato, estilo visual.\n- Quando tiver informações suficientes, explique rapidamente o que vai gerar e use a ferramenta decide_image_generation com um final_prompt muito detalhado (quem aparece, cenário, luz, emoção, enquadramento, estilo, plataforma, ângulo de marketing etc.).\n\nIMPORTANTE:\n- Na sua primeira resposta, a estrutura deve ser exatamente:\n[UI_MODE:CHAT]\n<linha em branco>\n<sua resposta em formato de conversa>\n- Nas respostas seguintes, responda APENAS como conversa, sem repetir [UI_MODE:CHAT].",
-            },
-            ...messages,
-          ],
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "decide_image_generation",
-                description:
-                  "Use quando você já tiver detalhes suficientes para gerar uma imagem realista e pronta para anúncio.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    ready: {
-                      type: "boolean",
-                      description:
-                        "Se true, significa que já temos informações suficientes para gerar a imagem.",
-                    },
-                    final_prompt: {
-                      type: "string",
-                      description:
-                        "Prompt completo, claro e detalhado descrevendo a imagem a ser gerada (personas, cenário, iluminação, estilo, emoção, enquadramento). Obrigatório quando ready = true.",
-                    },
+    // Descobre se a IA já respondeu alguma vez neste chat
+    const hasPreviousAssistantReply = messages.some((m: any) => m.role === "assistant");
+
+    const baseSystemPrompt =
+      "Você é um assistente de imagens que funciona em modo de chat contínuo.\n\n" +
+      "REGRAS DE INTERFACE (CRÍTICAS):\n" +
+      "- Na PRIMEIRA resposta após qualquer mensagem do usuário, você DEVE começar a mensagem com o comando exato, em uma linha separada: [UI_MODE:CHAT]\n" +
+      "- Esse comando serve apenas para a interface e NUNCA deve ser explicado, comentado ou descrito para o usuário.\n" +
+      "- O comando [UI_MODE:CHAT] deve aparecer apenas UMA vez, na sua primeira resposta nesse chat. Depois disso, NUNCA repita esse comando.\n\n" +
+      "COMPORTAMENTO DE CONVERSA (IMPORTANTE):\n" +
+      "- Você PODE fazer no máximo UMA rodada de perguntas curtas para entender o contexto antes de gerar a imagem.\n" +
+      "- Depois dessa primeira rodada, você NÃO PODE mais fazer novas perguntas. Use o que já tem para decidir e gerar a imagem.\n" +
+      "- Nunca peça para o usuário ‘escrever um prompt’, apenas faça perguntas naturais.\n" +
+      "- Nunca reinicie a conversa por conta própria e nunca mude o modo de interação.\n" +
+      "- Responda SEMPRE em português do Brasil.\n\n" +
+      "OBJETIVO DA ASSISTENTE:\n" +
+      "- Você é especialista em criativos de performance (Meta Ads, TikTok, Reels, Instagram) e ajuda a definir e refinar imagens ultra realistas para anúncios.\n" +
+      "- Quando o pedido estiver vago, faça perguntas curtas sobre: negócio/produto, público, objetivo da campanha, plataforma/formato, estilo visual.\n" +
+      "- Quando tiver informações suficientes, explique rapidamente o que vai gerar e use a ferramenta decide_image_generation com um final_prompt muito detalhado (quem aparece, cenário, luz, emoção, enquadramento, estilo, plataforma, ângulo de marketing etc.).\n\n" +
+      "FORMATO DA PRIMEIRA RESPOSTA:\n" +
+      "- Na sua primeira resposta, a estrutura deve ser exatamente:\n[UI_MODE:CHAT]\n<linha em branco>\n<sua resposta em formato de conversa>.";
+
+    // Mensagem extra para reforçar o comportamento quando já houve uma resposta anterior
+    const followupBehaviorPrompt = hasPreviousAssistantReply
+      ? "Atenção: já existe ao menos uma resposta SUA (assistant) no histórico desta conversa. A partir de agora você NÃO PODE mais fazer novas perguntas.\n" +
+        "Use obrigatoriamente a ferramenta decide_image_generation, com ready=true e um final_prompt completo baseado em tudo que já foi conversado.\n" +
+        "Na mensagem para o usuário, seja breve: explique em 1–2 frases o conceito da imagem que será gerada."
+      : "Você ainda não respondeu nada nesta conversa. Você PODE fazer UMA rodada de perguntas curtas para clarificar o contexto ANTES de decidir gerar a imagem. Depois disso, não faça mais perguntas adicionais, apenas decida e gere.";
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          {
+            role: "system",
+            content: baseSystemPrompt,
+          },
+          {
+            role: "system",
+            content: followupBehaviorPrompt,
+          },
+          ...messages,
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "decide_image_generation",
+              description:
+                "Use quando você já tiver detalhes suficientes para gerar uma imagem realista e pronta para anúncio.",
+              parameters: {
+                type: "object",
+                properties: {
+                  ready: {
+                    type: "boolean",
+                    description:
+                      "Se true, significa que já temos informações suficientes para gerar a imagem.",
                   },
-                  required: ["ready"],
-                  additionalProperties: false,
+                  final_prompt: {
+                    type: "string",
+                    description:
+                      "Prompt completo, claro e detalhado descrevendo a imagem a ser gerada (personas, cenário, iluminação, estilo, emoção, enquadramento). Obrigatório quando ready = true.",
+                  },
                 },
+                required: ["ready"],
+                additionalProperties: false,
               },
             },
-          ],
-        }),
-      },
-    );
+          },
+        ],
+      }),
+    });
 
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(
           JSON.stringify({
-            error:
-              "Limite de requisições de IA excedido. Tente novamente em alguns instantes.",
+            error: "Limite de requisições de IA excedido. Tente novamente em alguns instantes.",
           }),
           {
             status: 429,
@@ -121,7 +149,7 @@ serve(async (req) => {
     let ready = false;
     let finalPrompt: string | null = null;
 
-    const toolCalls = message.tool_calls as
+    const toolCalls = (message as any).tool_calls as
       | Array<{ function?: { arguments?: string } }>
       | undefined;
 
@@ -147,8 +175,8 @@ serve(async (req) => {
         "Não tenho certeza se entendi. Pode explicar com um pouco mais de detalhe o tipo de imagem que você quer?";
     }
 
-    // Garante que SEMPRE haja o marcador de modo de interface
-    if (!assistantText.includes("[UI_MODE:CHAT]")) {
+    // Garante que SEMPRE haja o marcador de modo de interface apenas na primeira resposta
+    if (!assistantText.includes("[UI_MODE:CHAT]") && !hasPreviousAssistantReply) {
       assistantText = `[UI_MODE:CHAT]\n\n${assistantText}`;
     }
 
