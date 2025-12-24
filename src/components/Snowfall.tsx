@@ -1,15 +1,15 @@
 import React from "react";
 
-const SNOWFLAKE_COUNT = 80;
+const SNOWFLAKE_COUNT = 180;
 
 const Snowfall: React.FC = () => {
   return (
     <div className="snowfall" aria-hidden="true">
       {Array.from({ length: SNOWFLAKE_COUNT }).map((_, index) => {
         const left = Math.random() * 100;
-        const delay = Math.random() * -20;
-        const duration = 10 + Math.random() * 10;
-        const size = 10 + Math.random() * 16;
+        const delay = Math.random() * -25;
+        const duration = 12 + Math.random() * 14;
+        const size = 12 + Math.random() * 20;
 
         return (
           <span
