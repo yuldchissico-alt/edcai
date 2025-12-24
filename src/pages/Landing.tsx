@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sparkles, Image as ImageIcon, Video, ArrowRight } from "lucide-react";
+import Snowfall from "@/components/Snowfall";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -14,8 +15,10 @@ const Landing = () => {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/60 text-foreground">
-      <header className="max-w-6xl mx-auto px-4 pt-6 pb-4 flex items-center justify-between gap-4">
+    <main className="relative min-h-screen bg-gradient-to-b from-background via-background to-muted/60 text-foreground overflow-hidden">
+      <Snowfall />
+
+      <header className="relative z-20 max-w-6xl mx-auto px-4 pt-6 pb-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-primary" />
@@ -49,7 +52,7 @@ const Landing = () => {
         </nav>
       </header>
 
-      <section className="max-w-3xl mx-auto px-4 pb-16 pt-10 space-y-10 text-center">
+      <section className="relative z-20 max-w-3xl mx-auto px-4 pb-16 pt-10 space-y-10 text-center">
         <div className="space-y-5">
           <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
             Landing Page
@@ -85,7 +88,7 @@ const Landing = () => {
           </div>
         </div>
 
-        <Card className="bg-card/80 border-border/40 p-6 md:p-7">
+        <Card className="bg-card/80 border-border/40 p-6 md:p-7 backdrop-blur-sm">
           <p className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground mb-3">
             Prévia do estúdio
           </p>
@@ -121,7 +124,7 @@ const Landing = () => {
         </Card>
       </section>
 
-      <section className="max-w-3xl mx-auto px-4 pb-20 space-y-6">
+      <section className="relative z-20 max-w-3xl mx-auto px-4 pb-20 space-y-6">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div className="space-y-2 max-w-xl">
             <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
@@ -199,7 +202,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="max-w-3xl mx-auto px-4 pb-16 pt-6 space-y-8">
+      <section className="relative z-20 max-w-3xl mx-auto px-4 pb-16 pt-6 space-y-8">
         <div className="space-y-2 max-w-2xl">
           <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
             Como o estúdio funciona
@@ -239,7 +242,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <section className="max-w-3xl mx-auto px-4 pb-20 space-y-6">
+      <section className="relative z-20 max-w-3xl mx-auto px-4 pb-20 space-y-6">
         <div className="space-y-2 text-center">
           <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
             Perguntas rápidas
@@ -282,7 +285,7 @@ const Landing = () => {
         </Accordion>
       </section>
 
-      <footer className="border-t border-border/40">
+      <footer className="relative z-20 border-t border-border/40">
         <div className="max-w-3xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
           <p className="tracking-wide">
             © {new Date().getFullYear()} Estúdio de Criativos IA. Todos os direitos reservados.
