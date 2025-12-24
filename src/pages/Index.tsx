@@ -519,8 +519,9 @@ const Index = () => {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex items-center justify-center">
-      <section className="flex-1 flex flex-col px-4 py-6 md:py-10 relative">
+    <main className="min-h-screen bg-background text-foreground flex items-stretch justify-center px-4 py-4 md:px-6 md:py-8">
+      <section className="w-full max-w-6xl mx-auto flex flex-col relative">
+
         <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
           <Button
             variant="outline"
@@ -551,11 +552,13 @@ const Index = () => {
           </Button>
         </div>
 
-        <div className="w-full max-w-5xl mx-auto flex gap-6 items-start">
-          <ConversationsSidebar />
+        <div className="w-full flex flex-col lg:flex-row gap-6 items-stretch lg:items-start mt-10 md:mt-12">
+           <ConversationsSidebar />
+ 
+-          <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
++          <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
+             <div className="flex flex-col items-center gap-3 text-center">
 
-          <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
-            <div className="flex flex-col items-center gap-3 text-center">
               <p className="text-xs md:text-sm uppercase tracking-[0.25em] text-muted-foreground/80">
                 Estúdio de Criativos com IA
               </p>
