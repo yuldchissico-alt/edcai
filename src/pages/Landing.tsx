@@ -281,6 +281,18 @@ const Landing = () => {
           </AccordionItem>
         </Accordion>
       </section>
+
+      <footer className="border-t border-border/40">
+        <div className="max-w-3xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+          <p className="tracking-wide">
+            © {new Date().getFullYear()} Estúdio de Criativos IA. Todos os direitos reservados.
+          </p>
+          <div className="flex items-center gap-4">
+            <button className="hover:text-foreground transition-colors">Termos</button>
+            <button className="hover:text-foreground transition-colors">Privacidade</button>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 };
