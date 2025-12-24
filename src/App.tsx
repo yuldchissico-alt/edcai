@@ -9,6 +9,7 @@ import Gallery from "./pages/Gallery";
 import Settings from "./pages/Settings";
 import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
+import Snowfall from "@/components/Snowfall";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <Snowfall />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
