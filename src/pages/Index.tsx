@@ -382,6 +382,7 @@ const Index = () => {
     } finally {
       setGeneratingImage(false);
     }
+  };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -531,8 +532,12 @@ const Index = () => {
     } finally {
       setChatLoading(false);
     }
+  };
+
+  const ConversationsSidebar = () => null;
 
   return (
+
     <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-4 md:px-6 md:py-8">
       <section className="w-full max-w-6xl mx-auto flex flex-col relative">
         <div className="w-full flex justify-center md:justify-end mb-4 md:mb-0">
