@@ -1,1 +1,13 @@
 project_id = "rsgaquaewdijowneztwq"
+
+[functions.generate-ad]
+verify_jwt = false
+
+[functions.generate-image]
+verify_jwt = false
+
+[functions.generate-video-frames]
+verify_jwt = false
+
+[functions.image-chat-assistant]
+verify_jwt = false
