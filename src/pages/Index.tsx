@@ -34,9 +34,9 @@ interface ChatMessage {
 const Index = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
+  const { isRecording, isTranscribing, startRecording, stopRecording } = useVoiceRecording();
+  
   const [prompt, setPrompt] = useState("");
   const [loadingAd, setLoadingAd] = useState(false);
   const [generatingVideo, setGeneratingVideo] = useState(false);
@@ -593,16 +593,39 @@ const Index = () => {
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           type="button"
-                          className="rounded-full w-9 h-9 flex items-center justify-center bg-muted text-muted-foreground"
-                          aria-label="Usar microfone (em breve)"
-                          onClick={() =>
-                            toast({
-                              title: "Recurso de voz em breve",
-                              description: "Em breve você poderá falar o que quer em vez de digitar o texto.",
-                            })
-                          }
+                          className={`rounded-full w-9 h-9 flex items-center justify-center transition-colors ${
+                            isRecording
+                              ? "bg-destructive text-destructive-foreground animate-pulse"
+                              : "bg-muted text-muted-foreground hover:bg-muted/80"
+                          }`}
+                          aria-label={isRecording ? "Gravando..." : "Gravar voz"}
+                          onMouseDown={async () => {
+                            await startRecording();
+                          }}
+                          onMouseUp={async () => {
+                            const transcribedText = await stopRecording();
+                            if (transcribedText) {
+                              setPrompt(transcribedText);
+                              await generateImagesFromPrompt(transcribedText);
+                            }
+                          }}
+                          onTouchStart={async () => {
+                            await startRecording();
+                          }}
+                          onTouchEnd={async () => {
+                            const transcribedText = await stopRecording();
+                            if (transcribedText) {
+                              setPrompt(transcribedText);
+                              await generateImagesFromPrompt(transcribedText);
+                            }
+                          }}
+                          disabled={isTranscribing}
                         >
-                          <Mic className="w-4 h-4" />
+                          {isTranscribing ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Mic className="w-4 h-4" />
+                          )}
                         </button>
                         <Button
                           type="submit"
