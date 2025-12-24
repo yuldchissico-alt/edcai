@@ -36,6 +36,8 @@ const Index = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
+  const { isRecording, isTranscribing, startRecording, stopRecording } = useVoiceRecording();
+  
   
   const [prompt, setPrompt] = useState("");
   const [loadingAd, setLoadingAd] = useState(false);
@@ -671,12 +673,44 @@ const Index = () => {
                       <div className="flex items-center gap-2 shrink-0">
                         <button
                           type="button"
-                          className="rounded-full w-9 h-9 flex items-center justify-center transition-colors bg-muted text-muted-foreground hover:bg-muted/80 disabled:opacity-60"
-                          aria-label="Selecionar áudio ou imagem"
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={processingFile}
+                          className={`rounded-full w-9 h-9 flex items-center justify-center transition-colors ${
+                            isRecording
+                              ? "bg-destructive text-destructive-foreground animate-pulse"
+                              : "bg-muted text-muted-foreground hover:bg-muted/80"
+                          } disabled:opacity-60`}
+                          aria-label={isRecording ? "Gravando áudio..." : "Segure para gravar áudio"}
+                          onMouseDown={async () => {
+                            await startRecording();
+                          }}
+                          onMouseUp={async () => {
+                            const transcribedText = await stopRecording();
+                            if (transcribedText) {
+                              setPrompt(transcribedText);
+                              await handleImageChat(transcribedText);
+                            }
+                          }}
+                          onMouseLeave={async () => {
+                            if (isRecording) {
+                              const transcribedText = await stopRecording();
+                              if (transcribedText) {
+                                setPrompt(transcribedText);
+                                await handleImageChat(transcribedText);
+                              }
+                            }
+                          }}
+                          onTouchStart={async () => {
+                            await startRecording();
+                          }}
+                          onTouchEnd={async () => {
+                            const transcribedText = await stopRecording();
+                            if (transcribedText) {
+                              setPrompt(transcribedText);
+                              await handleImageChat(transcribedText);
+                            }
+                          }}
+                          disabled={isTranscribing}
                         >
-                          {processingFile ? (
+                          {isTranscribing ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
                             <Mic className="w-4 h-4" />
