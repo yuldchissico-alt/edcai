@@ -521,34 +521,36 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-4 md:px-6 md:py-8">
       <section className="w-full max-w-6xl mx-auto flex flex-col relative">
-        <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate("/gallery")}
-            className="flex items-center gap-2 rounded-full px-2 py-0.5 text-xs md:text-sm bg-background/80 backdrop-blur-sm border-border/60"
-          >
-            <Images className="w-3 h-3" />
-            Minhas Fotos
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/settings")}
-            className="rounded-full text-xs md:text-sm text-muted-foreground hover:text-foreground"
-            title="Configurações"
-          >
-            <Clock className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleLogout}
-            className="rounded-full text-xs md:text-sm text-muted-foreground hover:text-destructive"
-            title="Sair"
-          >
-            <LogOut className="w-4 h-4" />
-          </Button>
+        <div className="w-full flex justify-center md:justify-end mb-4 md:mb-0">
+          <div className="flex items-center gap-2 z-10 bg-background/80 backdrop-blur-sm rounded-full px-2 py-1 border border-border/60">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/gallery")}
+              className="flex items-center gap-2 rounded-full px-2 py-0.5 text-xs md:text-sm"
+            >
+              <Images className="w-3 h-3" />
+              Minhas Fotos
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/settings")}
+              className="rounded-full text-xs md:text-sm text-muted-foreground hover:text-foreground"
+              title="Configurações"
+            >
+              <Clock className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              className="rounded-full text-xs md:text-sm text-muted-foreground hover:text-destructive"
+              title="Sair"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
         <div className="w-full flex flex-col lg:flex-row gap-6 items-center lg:items-start">
