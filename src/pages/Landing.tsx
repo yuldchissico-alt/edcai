@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Sparkles, Image as ImageIcon, Video, ArrowRight } from "lucide-react";
 
 const Landing = () => {
@@ -139,7 +140,7 @@ const Landing = () => {
             variant="outline"
             className="w-full md:w-auto"
             onClick={() => navigate("/settings")}
-         >
+          >
             Ver detalhes dos planos
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
@@ -196,6 +197,89 @@ const Landing = () => {
             </div>
           </Card>
         </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 pb-16 pt-6 space-y-8">
+        <div className="space-y-2 max-w-2xl">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
+            Como o estúdio funciona
+          </p>
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+            Do briefing ao criativo aprovado em três passos.
+          </h2>
+          <p className="text-sm md:text-base text-muted-foreground">
+            Use prompts já validados, gere variações em lote e organize tudo em um único fluxo de aprovação.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="bg-background/60 border-border/60 p-4 space-y-2">
+            <p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">Passo 1</p>
+            <h3 className="text-base font-semibold">Defina o contexto da campanha</h3>
+            <p className="text-sm text-muted-foreground">
+              Informe produto, público, promessa principal e canal (Meta, TikTok, YouTube) em linguagem simples.
+            </p>
+          </Card>
+
+          <Card className="bg-background/60 border-border/60 p-4 space-y-2">
+            <p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">Passo 2</p>
+            <h3 className="text-base font-semibold">Gere roteiros, ganchos e imagens</h3>
+            <p className="text-sm text-muted-foreground">
+              A IA cria ganchos, cenas, CTAs e imagens sugeridas já pensando em CTR e tempo de retenção.
+            </p>
+          </Card>
+
+          <Card className="bg-background/60 border-border/60 p-4 space-y-2">
+            <p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">Passo 3</p>
+            <h3 className="text-base font-semibold">Aprove, exporte e teste A/B</h3>
+            <p className="text-sm text-muted-foreground">
+              Ajuste detalhes, exporte as variações e leve direto para o gerenciador de anúncios.
+            </p>
+          </Card>
+        </div>
+      </section>
+
+      <section className="max-w-4xl mx-auto px-4 pb-20 space-y-6">
+        <div className="space-y-2 text-center">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
+            Perguntas rápidas
+          </p>
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+            Antes de criar sua conta
+          </h2>
+          <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
+            Tire as principais dúvidas sobre uso, limite de gerações e plano gratuito antes de testar o estúdio.
+          </p>
+        </div>
+
+        <Accordion type="single" collapsible className="w-full bg-background/50 border border-border/60 rounded-xl px-4 py-3 md:px-6 md:py-4">
+          <AccordionItem value="q1" className="border-b border-border/40 last:border-0">
+            <AccordionTrigger className="text-sm md:text-base font-medium text-left">
+              Preciso cadastrar cartão para usar o plano Starter?
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground">
+              Não. O plano Starter é pensado para teste: você cria conta, gera criativos com limite mensal e só migra para um plano pago se fizer sentido para o seu fluxo.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="q2" className="border-b border-border/40 last:border-0">
+            <AccordionTrigger className="text-sm md:text-base font-medium text-left">
+              O estúdio funciona para qualquer nicho?
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground">
+              Sim. Você pode usar em lançamentos, perpétuo, e-commerce e serviços locais. O que muda é o contexto que você passa no briefing inicial.
+            </AccordionContent>
+          </AccordionItem>
+
+          <AccordionItem value="q3" className="border-b border-border/40 last:border-0">
+            <AccordionTrigger className="text-sm md:text-base font-medium text-left">
+              Consigo usar com minha equipe ou gestor de tráfego?
+            </AccordionTrigger>
+            <AccordionContent className="text-sm text-muted-foreground">
+              Hoje o acesso é individual, mas os criativos gerados podem ser compartilhados com seu time por exportação. Em breve, haverá recursos específicos para equipes.
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </section>
     </main>
   );
