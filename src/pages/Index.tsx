@@ -56,6 +56,49 @@ const Index = () => {
   const [processingFile, setProcessingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const showGeminiErrorToast = (err: unknown, context: "image" | "chat") => {
+    const anyErr = err as any;
+    const status = anyErr?.status ?? anyErr?.cause?.status;
+
+    const title =
+      context === "image"
+        ? "Erro ao gerar imagens"
+        : "Erro ao conversar com a IA de imagem";
+
+    let description: string;
+
+    switch (status) {
+      case 400:
+        description =
+          "Requisição inválida enviada para a API de imagens. Revise o prompt e tente novamente.";
+        break;
+      case 401:
+      case 403:
+        description =
+          "Chave da API de imagens inválida ou sem permissão. Verifique a configuração da GEMINI_API_KEY.";
+        break;
+      case 429:
+        description =
+          "Limite de requisições da API Gemini excedido. Aguarde alguns segundos e tente novamente.";
+        break;
+      case 500:
+        description =
+          "Erro interno na API de imagens. Tente novamente em alguns instantes.";
+        break;
+      default:
+        description =
+          anyErr instanceof Error && anyErr.message
+            ? anyErr.message
+            : "Ocorreu um erro ao se comunicar com a API de imagens. Tente novamente em alguns instantes.";
+    }
+
+    toast({
+      title,
+      description,
+      variant: "destructive",
+    });
+  };
+
   const fetchConversations = useCallback(async (userId: string) => {
     const { data, error } = await supabase
       .from("conversations")
@@ -335,15 +378,11 @@ const Index = () => {
       }
     } catch (err) {
       console.error("Error generating image:", err);
-      toast({
-        title: "Erro ao gerar imagens",
-        description: err instanceof Error ? err.message : "Tente novamente em alguns instantes.",
-        variant: "destructive",
-      });
+      showGeminiErrorToast(err, "image");
     } finally {
       setGeneratingImage(false);
     }
-  };
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
@@ -488,172 +527,10 @@ const Index = () => {
       }
     } catch (err) {
       console.error("Error in image chat:", err);
-      toast({
-        title: "Erro ao conversar com a IA de imagem",
-        description: err instanceof Error ? err.message : "Tente novamente em alguns instantes.",
-        variant: "destructive",
-      });
+      showGeminiErrorToast(err, "chat");
     } finally {
       setChatLoading(false);
     }
-  };
-
-  const handleGenerateImages = async () => {
-    await handleImageChat();
-  };
-
-  const ConversationsSidebar = () => null;
-
-  if (uiMode === "CHAT") {
-    return (
-      <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted/60 text-foreground flex items-center justify-center px-4 py-6 md:py-10">
-        <section className="w-full max-w-5xl mx-auto flex gap-4 h-full max-h-[90vh]">
-          <ConversationsSidebar />
-
-          <div className="flex-1 flex flex-col gap-5 animate-fade-in">
-            <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-border/40">
-              <div className="space-y-1 min-w-0">
-                <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-muted-foreground/80">
-                  Estúdio de Criativos com IA
-                </p>
-                <h1 className="text-base sm:text-lg md:text-2xl font-semibold tracking-tight leading-snug break-words">
-                  Chat de imagens em tempo real
-                </h1>
-              </div>
-              <div className="flex flex-wrap sm:flex-nowrap items-center justify-start sm:justify-end gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setUiMode("DASHBOARD")}
-                  className="rounded-full px-3 text-xs md:text-sm w-full sm:w-auto justify-center"
-                >
-                  Voltar para dashboard
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => navigate("/settings")} title="Configurações">
-                  <Clock className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => navigate("/gallery")} title="Minhas Fotos">
-                  <Images className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">
-                  <LogOut className="w-4 h-4" />
-                </Button>
-              </div>
-            </header>
-
-            <Card className="bg-muted/40 border-border/60 p-4 space-y-3 flex flex-col flex-1 min-h-0">
-              <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-                {chatMessages.length === 0 && !chatLoading && (
-                  <div className="h-full flex flex-col items-center justify-center text-center gap-3 text-sm text-muted-foreground">
-                    <p>Comece a conversa descrevendo o que você precisa em uma imagem.</p>
-                    <p className="text-xs max-w-sm">
-                      Fale comigo como se estivesse falando com um especialista humano em criativos. Eu vou entender seu contexto e sugerir as melhores imagens.
-                    </p>
-                  </div>
-                )}
-
-                {chatMessages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm border border-border/40 bg-background/60 flex flex-col gap-2 ${
-                      msg.role === "user" ? "ml-auto" : "mr-auto"
-                    }`}
-                  >
-                    <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                      {msg.role === "user" ? "Você" : "IA"}
-                    </span>
-                    {msg.content && <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>}
-                    {msg.imageUrl && (
-                      <div className="space-y-2">
-                        <div className="overflow-hidden rounded-lg border bg-background">
-                          <img
-                            src={msg.imageUrl}
-                            alt="Imagem gerada pela IA"
-                            className="w-full h-auto object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => {
-                            const a = document.createElement("a");
-                            a.href = msg.imageUrl!;
-                            a.download = "imagem-gerada.png";
-                            a.click();
-                          }}
-                        >
-                          Baixar imagem
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {chatLoading && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                  IA está digitando...
-                </p>
-              )}
-            </Card>
-
-            <Card className="bg-muted/50 border-border/60 px-4 py-3 rounded-full shadow-sm">
-              <form
-                className="flex items-center gap-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleImageChat();
-                  setPrompt("");
-                }}
-              >
-                <div className="shrink-0 flex items-center justify-center">
-                  <button
-                    type="button"
-                    className="rounded-full bg-background/40 w-8 h-8 flex items-center justify-center"
-                    aria-label="Adicionar arquivo (imagem ou áudio)"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Plus className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*,audio/*"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                </div>
-                <Textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Descreva a imagem que quer gerar..."
-                  className="border-none bg-transparent resize-none min-h-10 max-h-24 px-0 text-sm md:text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-                />
-                <div className="flex items-center gap-2 shrink-0">
-                  <Button
-                    type="submit"
-                    size="icon"
-                    className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
-                    disabled={chatLoading || generatingImage}
-                    aria-label="Enviar para IA de imagem"
-                  >
-                    {chatLoading || generatingImage ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <ImageIcon className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Card>
-          </div>
-        </section>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-4 md:px-6 md:py-8">
