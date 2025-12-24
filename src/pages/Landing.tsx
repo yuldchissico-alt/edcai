@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Sparkles, Image as ImageIcon, Video, ArrowRight } from "lucide-react";
 
 const Landing = () => {
@@ -124,6 +125,84 @@ const Landing = () => {
             </div>
           </div>
         </Card>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 pb-20 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div className="space-y-2 max-w-xl">
+            <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
+              Planos pensados para criativos
+            </p>
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+              Comece grátis e evolua conforme suas campanhas escalam.
+            </h2>
+            <p className="text-sm md:text-base text-muted-foreground">
+              Do primeiro criativo de teste ao fluxo semanal de lançamentos, escolha um plano que acompanha o seu ritmo.
+            </p>
+          </div>
+
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full md:w-auto"
+            onClick={() => navigate("/settings")}
+         >
+            Ver detalhes dos planos
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="bg-muted/40 border-border/60 p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold">Starter</h3>
+              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                Início
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground flex-1">
+              Para quem está começando a testar criativos com IA em campanhas pequenas.
+            </p>
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-xl">R$ 0</p>
+              <p className="text-xs text-muted-foreground">Ideal para teste</p>
+            </div>
+          </Card>
+
+          <Card className="bg-primary/5 border-primary/40 p-4 flex flex-col gap-3 shadow-md shadow-primary/20">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold flex items-center gap-2">
+                Pro
+                <Badge className="text-[10px] uppercase tracking-wide bg-primary text-primary-foreground">
+                  Mais usado
+                </Badge>
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground flex-1">
+              Para gestores de tráfego que precisam testar criativos semanalmente em várias contas.
+            </p>
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-xl">R$ 97/mês</p>
+              <p className="text-xs text-muted-foreground">Foco em performance</p>
+            </div>
+          </Card>
+
+          <Card className="bg-muted/40 border-border/60 p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold">Agência</h3>
+              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                Escala
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground flex-1">
+              Para times que gerenciam múltiplos clientes e precisam padronizar a criação de criativos.
+            </p>
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold text-xl">R$ 297/mês</p>
+              <p className="text-xs text-muted-foreground">Pensado para equipes</p>
+            </div>
+          </Card>
+        </div>
       </section>
     </main>
   );
