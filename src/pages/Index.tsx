@@ -569,14 +569,6 @@ const Index = () => {
             </div>
 
             <Tabs defaultValue="dashboard" className="flex-1 flex flex-col w-full mt-2">
-              <TabsList className="w-full max-w-xs mx-auto rounded-full bg-muted/70 p-1">
-                <TabsTrigger value="dashboard" className="flex-1 rounded-full text-xs md:text-sm">
-                  Dashboard
-                </TabsTrigger>
-                <TabsTrigger value="chat" className="flex-1 rounded-full text-xs md:text-sm">
-                  Chat de imagens
-                </TabsTrigger>
-              </TabsList>
 
               <TabsContent value="dashboard" className="flex-1 w-full">
                 <div className="w-full max-w-3xl mx-auto space-y-8 mt-4">
