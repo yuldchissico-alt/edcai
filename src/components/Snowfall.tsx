@@ -1,16 +1,16 @@
 import React from "react";
 
-const SNOWFLAKE_COUNT = 320;
+const SNOWFLAKE_COUNT = 260;
 
 const Snowfall: React.FC = () => {
   return (
     <div className="snowfall" aria-hidden="true">
       {Array.from({ length: SNOWFLAKE_COUNT }).map((_, index) => {
         const left = Math.random() * 100;
-        const delay = Math.random() * -18;
-        const duration = 14 + Math.random() * 10;
-        const size = 18 + Math.random() * 22;
-        const opacity = 0.6 + Math.random() * 0.4;
+        const delay = Math.random() * -24;
+        const duration = 14 + Math.random() * 14;
+        const size = 3 + Math.random() * 4;
+        const opacity = 0.3 + Math.random() * 0.5;
 
         return (
           <span
@@ -20,12 +20,11 @@ const Snowfall: React.FC = () => {
               left: `${left}%`,
               animationDelay: `${delay}s`,
               animationDuration: `${duration}s`,
-              fontSize: `${size}px`,
+              width: `${size}px`,
+              height: `${size}px`,
               opacity,
             }}
-          >
-            ❄
-          </span>
+          />
         );
       })}
     </div>
