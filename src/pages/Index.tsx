@@ -58,7 +58,26 @@ const Index = () => {
 
   const showGeminiErrorToast = (err: unknown, context: "image" | "chat") => {
     const anyErr = err as any;
-    const status = anyErr?.status ?? anyErr?.cause?.status;
+
+    // Tenta extrair status de várias formas (edge function + Supabase + mensagem)
+    let status: number | undefined = anyErr?.status ?? anyErr?.cause?.status ?? anyErr?.context?.response?.status;
+
+    const msg: string | undefined =
+      typeof anyErr?.message === "string" ? anyErr.message : undefined;
+
+    if (!status && typeof anyErr?.code === "string" && /^\d{3}$/.test(anyErr.code)) {
+      status = Number(anyErr.code);
+    }
+
+    if (!status && msg) {
+      // Procura um código HTTP na mensagem (ex: "Edge function returned 429")
+      const match = msg.match(/\b(400|401|403|429|500)\b/);
+      if (match) {
+        status = Number(match[1]);
+      } else if (msg.includes("Limite de requisições da API Gemini excedido")) {
+        status = 429;
+      }
+    }
 
     const title =
       context === "image"
@@ -87,9 +106,8 @@ const Index = () => {
         break;
       default:
         description =
-          anyErr instanceof Error && anyErr.message
-            ? anyErr.message
-            : "Ocorreu um erro ao se comunicar com a API de imagens. Tente novamente em alguns instantes.";
+          msg ??
+          "Ocorreu um erro ao se comunicar com a API de imagens. Tente novamente em alguns instantes.";
     }
 
     toast({
