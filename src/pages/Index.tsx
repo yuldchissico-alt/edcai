@@ -248,20 +248,24 @@ const Index = () => {
       });
       return;
     }
+
     try {
       setGeneratingImage(true);
       toast({
         title: "Gerando imagem...",
         description: "Criando uma imagem ultra-realista para o seu prompt.",
       });
+
       const { data, error } = await supabase.functions.invoke("generate-image", {
         body: {
           prompt: promptText,
           aspectRatio: imageAspect,
         },
       });
+
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
+
       const imageUrl = data.image as string;
 
       let convId = conversationId;
@@ -289,6 +293,46 @@ const Index = () => {
           await fetchConversations(user.id);
         }
       }
+
+      // Salvar imagem gerada na galeria do usuário
+      if (user && imageUrl.startsWith("data:image")) {
+        try {
+          const [header, base64Data] = imageUrl.split(",");
+          const mimeMatch = header.match(/data:(.*);base64/);
+          const mimeType = mimeMatch?.[1] || "image/png";
+
+          const binaryString = atob(base64Data);
+          const len = binaryString.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+
+          const blob = new Blob([bytes], { type: mimeType });
+          const fileExt = mimeType.split("/")[1] || "png";
+          const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from("user-photos")
+            .upload(fileName, blob);
+
+          if (uploadError) {
+            console.error("Erro ao salvar imagem gerada no storage:", uploadError);
+          } else {
+            const { error: dbError } = await supabase.from("photos").insert({
+              user_id: user.id,
+              storage_path: fileName,
+              title: promptText.slice(0, 80),
+            });
+
+            if (dbError) {
+              console.error("Erro ao salvar registro de foto gerada:", dbError);
+            }
+          }
+        } catch (saveError) {
+          console.error("Erro ao salvar imagem gerada na galeria:", saveError);
+        }
+      }
     } catch (err) {
       console.error("Error generating image:", err);
       toast({
@@ -300,7 +344,6 @@ const Index = () => {
       setGeneratingImage(false);
     }
   };
-
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
