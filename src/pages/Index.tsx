@@ -577,7 +577,7 @@ const Index = () => {
               </TabsList>
 
               <TabsContent value="dashboard" className="flex-1 w-full">
-                <div className="w-full max-w-3xl space-y-8 mt-4">
+                <div className="w-full max-w-3xl mx-auto space-y-8 mt-4">
                   <Card className="bg-card/80 border-border/60 px-4 py-3 md:px-6 md:py-4 rounded-2xl shadow-sm max-w-3xl mx-auto">
                     <form
                       className="flex items-center gap-3 md:gap-4"
