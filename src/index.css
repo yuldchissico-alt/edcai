@@ -116,11 +116,9 @@ All colors MUST be HSL.
   .snowflake {
     position: absolute;
     top: -10%;
-    color: hsl(0 0% 100% / 0.85);
-    text-shadow: 0 0 8px hsl(var(--primary-glow) / 0.7);
-    animation-name: snow-fall;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
+    color: hsl(0 0% 100% / 0.96);
+    text-shadow: 0 0 10px hsl(var(--primary-glow) / 0.85);
+    animation: snow-fall 18s linear infinite;
     will-change: transform, opacity;
   }
 
