@@ -58,11 +58,11 @@ const Landing = () => {
             Landing Page
           </p>
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight">
-            Crie criativos de anúncios em minutos usando IA, texto e imagens.
+            Crie imagens de anúncios em minutos usando IA.
           </h1>
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
-            Gere roteiros, imagens e variações de criativos para campanhas em Meta, TikTok e outras
-            plataformas. Tudo em um único estúdio, conectado ao seu fluxo de trabalho.
+            Gere imagens ultra realistas e prontas para campanhas em Meta, TikTok e outras plataformas.
+            Tudo em um único estúdio focado em criativos de alta performance.
           </p>
 
           <div className="flex flex-wrap justify-center gap-3 items-center">
@@ -75,15 +75,15 @@ const Landing = () => {
           <div className="flex flex-wrap justify-center gap-4 pt-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                <Video className="w-3 h-3 text-primary" />
+                <ImageIcon className="w-3 h-3 text-primary" />
               </div>
-              <span>Scripts e cenas de vídeo automáticos</span>
+              <span>Imagens realistas otimizadas para anúncios</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
                 <ImageIcon className="w-3 h-3 text-primary" />
               </div>
-              <span>Imagens realistas otimizadas para anúncios</span>
+              <span>Formatos prontos para feeds, stories e reels</span>
             </div>
           </div>
         </div>
@@ -96,16 +96,16 @@ const Landing = () => {
             <div className="space-y-2">
               <p className="font-medium text-foreground text-sm">Prompt de exemplo</p>
               <p className="bg-muted/60 rounded-lg p-3 border border-border/40 text-xs leading-relaxed text-left">
-                "Crie um anúncio em vídeo de 30s para um curso online de tráfego pago, focado em
-                resultados rápidos para pequenos negócios."
+                "Crie uma imagem para anúncio no Instagram mostrando uma mulher empreendedora em um escritório
+                moderno, com atmosfera profissional e cores que remetam a confiança."
               </p>
             </div>
 
             <div className="grid gap-3 md:grid-cols-2 pt-2">
               <div className="rounded-lg border border-border/50 bg-background/60 p-3 space-y-2 text-left">
-                <p className="text-xs font-medium text-foreground">Geração de roteiro</p>
+                <p className="text-xs font-medium text-foreground">Briefing inteligente</p>
                 <p className="text-[11px] leading-relaxed">
-                  A IA cria o gancho, 3 cenas e CTA pronto para colar no gerenciador de anúncios.
+                  A IA entende seu contexto de campanha e transforma em um briefing visual claro para gerar imagens.
                 </p>
               </div>
               <div className="rounded-lg border border-border/50 bg-background/60 p-3 space-y-2 text-left">
@@ -208,10 +208,10 @@ const Landing = () => {
             Como o estúdio funciona
           </p>
           <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-            Do briefing ao criativo aprovado em três passos.
+            Do briefing da campanha à imagem aprovada em três passos.
           </h2>
           <p className="text-sm md:text-base text-muted-foreground">
-            Use prompts já validados, gere variações em lote e organize tudo em um único fluxo de aprovação.
+            Use prompts simples, refine com a IA e gere imagens prontas para subir direto nas campanhas.
           </p>
         </div>
 
@@ -220,23 +220,23 @@ const Landing = () => {
             <p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">Passo 1</p>
             <h3 className="text-base font-semibold">Defina o contexto da campanha</h3>
             <p className="text-sm text-muted-foreground">
-              Informe produto, público, promessa principal e canal (Meta, TikTok, YouTube) em linguagem simples.
+              Informe produto, público, oferta e plataforma (Meta, TikTok, YouTube) em linguagem simples.
             </p>
           </Card>
 
           <Card className="bg-background/60 border-border/60 p-4 space-y-2">
             <p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">Passo 2</p>
-            <h3 className="text-base font-semibold">Gere roteiros, ganchos e imagens</h3>
+            <h3 className="text-base font-semibold">Refine o tipo de imagem</h3>
             <p className="text-sm text-muted-foreground">
-              A IA cria ganchos, cenas, CTAs e imagens sugeridas já pensando em CTR e tempo de retenção.
+              A IA te ajuda a decidir enquadramento, estilo visual, cenário e nível de realismo ideais.
             </p>
           </Card>
 
           <Card className="bg-background/60 border-border/60 p-4 space-y-2">
             <p className="text-xs font-medium text-primary uppercase tracking-[0.2em]">Passo 3</p>
-            <h3 className="text-base font-semibold">Aprove, exporte e teste A/B</h3>
+            <h3 className="text-base font-semibold">Gere, baixe e teste</h3>
             <p className="text-sm text-muted-foreground">
-              Ajuste detalhes, exporte as variações e leve direto para o gerenciador de anúncios.
+              Gere imagens em diferentes proporções, baixe os arquivos e teste variações nas campanhas.
             </p>
           </Card>
         </div>
@@ -267,10 +267,10 @@ const Landing = () => {
 
           <AccordionItem value="q2" className="border-b border-border/40 last:border-0">
             <AccordionTrigger className="text-sm md:text-base font-medium text-left">
-              O estúdio funciona para qualquer nicho?
+              As imagens servem para vídeos ou só para criativos estáticos?
             </AccordionTrigger>
             <AccordionContent className="text-sm text-muted-foreground">
-              Sim. Você pode usar em lançamentos, perpétuo, e-commerce e serviços locais. O que muda é o contexto que você passa no briefing inicial.
+              Hoje o foco é em criativos estáticos (imagens) para feeds, stories e reels. Você pode combinar essas imagens com roteiros de vídeo que já usa nas campanhas.
             </AccordionContent>
           </AccordionItem>
 
