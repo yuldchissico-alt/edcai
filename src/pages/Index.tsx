@@ -594,7 +594,13 @@ const Index = () => {
                         <button
                           type="button"
                           className="rounded-full w-9 h-9 flex items-center justify-center bg-muted text-muted-foreground"
-                          aria-label="Microfone (em breve)"
+                          aria-label="Usar microfone (em breve)"
+                          onClick={() =>
+                            toast({
+                              title: "Recurso de voz em breve",
+                              description: "Em breve você poderá falar o que quer em vez de digitar o texto.",
+                            })
+                          }
                         >
                           <Mic className="w-4 h-4" />
                         </button>
@@ -602,10 +608,14 @@ const Index = () => {
                           type="submit"
                           size="icon"
                           className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-                          disabled={loadingAd}
-                          aria-label="Gerar anúncio"
+                          disabled={chatLoading || generatingImage}
+                          aria-label="Gerar imagem"
                         >
-                          {loadingAd ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                          {chatLoading || generatingImage ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Sparkles className="w-4 h-4" />
+                          )}
                         </Button>
                       </div>
                     </form>
