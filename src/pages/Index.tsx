@@ -675,63 +675,8 @@ const Index = () => {
                     </div>
                   </div>
 
-                  {chatMessages.length > 0 && (
-                    <Card className="bg-card/80 border-border/60 p-4 md:p-5 space-y-3 flex flex-col h-[60vh] rounded-2xl shadow-sm">
-                      <h2 className="text-sm md:text-base font-medium flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-primary" />
-                        Assistente de imagem
-                      </h2>
-                      <div className="space-y-3 flex-1 overflow-y-auto pr-1">
-                        {chatMessages.map((msg, index) => (
-                          <div
-                            key={index}
-                            className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm border border-border/40 bg-background/70 flex flex-col gap-2 hover-scale transition-transform ${
-                              msg.role === "user" ? "ml-auto" : "mr-auto"
-                            }`}
-                          >
-                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                              {msg.role === "user" ? "Você" : "IA"}
-                            </span>
-                            {msg.content && <p className="whitespace-pre-wrap leading-relaxed text-sm md:text-[15px]">{msg.content}</p>}
-                            {msg.imageUrl && (
-                              <div className="space-y-2">
-                                <div className="overflow-hidden rounded-xl border bg-background">
-                                  <img
-                                    src={msg.imageUrl}
-                                    alt="Imagem gerada pela IA"
-                                    className="w-full h-auto object-cover"
-                                    loading="lazy"
-                                  />
-                                </div>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="w-full text-xs md:text-sm rounded-full"
-                                  onClick={() => {
-                                    const a = document.createElement("a");
-                                    a.href = msg.imageUrl!;
-                                    a.download = "imagem-gerada.png";
-                                    a.click();
-                                  }}
-                                >
-                                  Baixar imagem
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                      {chatLoading && (
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                          Pensando na melhor forma de gerar sua imagem...
-                        </p>
-                      )}
-                    </Card>
-                  )}
-
-                {adContent && (
-                  <section className="space-y-6">
+                  {adContent && (
+                    <section className="space-y-6">
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                       <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-primary" />
