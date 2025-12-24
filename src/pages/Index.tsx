@@ -373,6 +373,8 @@ const Index = () => {
   };
 
 
+  const handleImageChat = async (initialPrompt?: string) => {
+    const messageContent = (initialPrompt ?? prompt).trim();
     if (!messageContent) {
       toast({
         title: "Digite um prompt",
@@ -450,6 +452,7 @@ const Index = () => {
       setChatLoading(false);
     }
   };
+
   const handleGenerateImages = async () => {
     await handleImageChat();
   };
