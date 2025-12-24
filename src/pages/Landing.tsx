@@ -58,7 +58,7 @@ const Landing = () => {
             Landing Page
           </p>
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight">
-            Crie imagens de anúncios em minutos usando IA.
+            Crie imagens em minutos usando IA.
           </h1>
           <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
             Gere fotos e imagens ultra realistas em poucos cliques.
