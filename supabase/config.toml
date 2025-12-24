@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.image-chat-assistant]
 verify_jwt = false
+
+[functions.generate-image-gemini-direct]
+verify_jwt = false
