@@ -161,7 +161,7 @@ const Landing = () => {
               Para quem está começando a testar criação de fotos com IA.
             </p>
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-xl">R$ 0</p>
+              <p className="font-semibold text-xl">MT 0</p>
               <p className="text-xs text-muted-foreground">Ideal para teste</p>
             </div>
           </Card>
@@ -179,7 +179,7 @@ const Landing = () => {
               Para quem precisa produzir imagens novas com frequência sem depender de bancos de imagem.
             </p>
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-xl">R$ 97/mês</p>
+              <p className="font-semibold text-xl">MT 1.150/mês</p>
               <p className="text-xs text-muted-foreground">Foco em performance</p>
             </div>
           </Card>
@@ -195,7 +195,7 @@ const Landing = () => {
               Para times que precisam padronizar a criação de fotos e visuais em vários projetos.
             </p>
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-xl">R$ 297/mês</p>
+              <p className="font-semibold text-xl">MT 3.500/mês</p>
               <p className="text-xs text-muted-foreground">Pensado para equipes</p>
             </div>
           </Card>
