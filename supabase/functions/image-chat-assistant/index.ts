@@ -17,9 +17,9 @@ serve(async (req) => {
       throw new Error("Campo 'messages' é obrigatório e deve ser um array");
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY não está configurada");
     }
 
     // Descobre se a IA já respondeu alguma vez neste chat
@@ -40,71 +40,65 @@ serve(async (req) => {
       "OBJETIVO DA ASSISTENTE:\n" +
       "- Você é especialista em criativos de performance (Meta Ads, TikTok, Reels, Instagram) e ajuda a definir e refinar imagens ultra realistas para anúncios.\n" +
       "- Quando o pedido estiver vago, faça perguntas curtas sobre: negócio/produto, público, objetivo da campanha, plataforma/formato, estilo visual.\n" +
-      "- Quando tiver informações suficientes, explique rapidamente o que vai gerar e use a ferramenta decide_image_generation com um final_prompt muito detalhado (quem aparece, cenário, luz, emoção, enquadramento, estilo, plataforma, ângulo de marketing etc.).\n\n" +
-      "FORMATO DA PRIMEIRA RESPOSTA:\n" +
-      "- Na sua primeira resposta, a estrutura deve ser exatamente:\n[UI_MODE:CHAT]\n<linha em branco>\n<sua resposta em formato de conversa>.";
+      "- Quando tiver informações suficientes, explique rapidamente o que vai gerar.\n\n" +
+      "FORMATO DE SAÍDA (CRÍTICO):\n" +
+      "Você DEVE responder APENAS com um JSON válido, sem nenhum texto antes ou depois. O formato EXATO é:\n" +
+      "{\n" +
+      "  \"assistant_reply\": \"mensagem em formato de chat para o usuário, em português\",\n" +
+      "  \"ready\": true ou false,\n" +
+      "  \"final_prompt\": \"prompt ultra detalhado para gerar a imagem, ou string vazia se ready=false\"\n" +
+      "}\n\n" +
+      "NUNCA inclua comentários, explicações ou texto fora do JSON.\n";
 
-    // Mensagem extra para reforçar o comportamento quando já houve uma resposta anterior
     const followupBehaviorPrompt = hasPreviousAssistantReply
-      ? "Atenção: já existe ao menos uma resposta SUA (assistant) no histórico desta conversa. A partir de agora você NÃO PODE mais fazer novas perguntas.\n" +
-        "Use obrigatoriamente a ferramenta decide_image_generation, com ready=true e um final_prompt completo baseado em tudo que já foi conversado.\n" +
-        "Na mensagem para o usuário, seja breve: explique em 1–2 frases o conceito da imagem que será gerada."
-      : "Você ainda não respondeu nada nesta conversa. Você PODE fazer UMA rodada de perguntas curtas para clarificar o contexto ANTES de decidir gerar a imagem. Depois disso, não faça mais perguntas adicionais, apenas decida e gere.";
+      ? "Atenção: já existe ao menos uma resposta SUA (assistant) no histórico desta conversa. A partir de agora você NÃO PODE mais fazer novas perguntas. Use as mensagens já existentes para decidir se está pronto para gerar a imagem (ready=true) e, se sim, produza um final_prompt completo."
+      : "Você ainda não respondeu nada nesta conversa. Você PODE fazer UMA rodada de perguntas curtas para clarificar o contexto ANTES de decidir gerar a imagem (ready=true). Depois disso, não faça mais perguntas adicionais, apenas decida e gere.";
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Constrói um resumo textual da conversa para enviar ao Gemini
+    const conversationText = messages
+      .map((m: any) => {
+        const role = m.role === "assistant" ? "Assistente" : "Usuário";
+        const content = (m.content ?? "").toString();
+        return `${role}: ${content}`;
+      })
+      .join("\n");
+
+    const fullPrompt = `${baseSystemPrompt}\n\nCONTEXTO ADICIONAL SOBRE O COMPORTAMENTO:\n${followupBehaviorPrompt}\n\nHISTÓRICO DE CONVERSA ATÉ AGORA:\n${conversationText}\n\nLembre-se: responda APENAS com o JSON no formato especificado.`;
+
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent" +
+      `?key=${GEMINI_API_KEY}`;
+
+    const body = {
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: fullPrompt }],
+        },
+      ],
+    };
+
+    const response = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: baseSystemPrompt,
-          },
-          {
-            role: "system",
-            content: followupBehaviorPrompt,
-          },
-          ...messages,
-        ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "decide_image_generation",
-              description:
-                "Use quando você já tiver detalhes suficientes para gerar uma imagem realista e pronta para anúncio.",
-              parameters: {
-                type: "object",
-                properties: {
-                  ready: {
-                    type: "boolean",
-                    description:
-                      "Se true, significa que já temos informações suficientes para gerar a imagem.",
-                  },
-                  final_prompt: {
-                    type: "string",
-                    description:
-                      "Prompt completo, claro e detalhado descrevendo a imagem a ser gerada (personas, cenário, iluminação, estilo, emoção, enquadramento). Obrigatório quando ready = true.",
-                  },
-                },
-                required: ["ready"],
-                additionalProperties: false,
-              },
-            },
-          },
-        ],
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        "Gemini error (image-chat-assistant):",
+        response.status,
+        errorText,
+      );
+
       if (response.status === 429) {
         return new Response(
           JSON.stringify({
-            error: "Limite de requisições de IA excedido. Tente novamente em alguns instantes.",
+            error:
+              "Limite de requisições da API Gemini excedido. Tente novamente em alguns instantes.",
           }),
           {
             status: 429,
@@ -112,79 +106,69 @@ serve(async (req) => {
           },
         );
       }
-      if (response.status === 402) {
+
+      if (response.status === 401 || response.status === 403) {
         return new Response(
           JSON.stringify({
             error:
-              "Créditos de IA insuficientes. Adicione créditos em Settings → Workspace → Usage.",
+              "A chave da API Gemini é inválida ou não tem permissão para este modelo.",
           }),
           {
-            status: 402,
+            status: response.status,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           },
         );
       }
 
-      const errorText = await response.text();
-      console.error("AI gateway error (image-chat-assistant):", response.status, errorText);
-      throw new Error("Erro ao conversar com a IA de imagem");
+      throw new Error("Erro ao conversar com a API do Gemini");
     }
 
     const data = await response.json();
-    console.log("image-chat-assistant raw response:", data);
+    console.log("image-chat-assistant Gemini response:", data);
 
-    const choice = data?.choices?.[0];
-    const message = choice?.message ?? {};
+    const firstCandidate = data?.candidates?.[0];
+    const parts = firstCandidate?.content?.parts ?? [];
+    const textPart = parts.find((p: any) => typeof p.text === "string");
+    const rawText: string = textPart?.text ?? "";
 
-    let assistantText = "";
-    const content: any = message.content;
-    if (typeof content === "string") {
-      assistantText = content;
-    } else if (Array.isArray(content)) {
-      assistantText = content
-        .map((c) => (typeof c === "string" ? c : c?.text ?? ""))
-        .join("");
-    }
-
+    let assistant_reply = "";
     let ready = false;
-    let finalPrompt: string | null = null;
+    let final_prompt: string | null = null;
 
-    const toolCalls = (message as any).tool_calls as
-      | Array<{ function?: { arguments?: string } }>
-      | undefined;
-
-    if (toolCalls && toolCalls.length > 0) {
-      const argsString = toolCalls[0]?.function?.arguments;
-      if (argsString) {
-        try {
-          const parsed = JSON.parse(argsString);
-          if (typeof parsed.ready === "boolean") {
-            ready = parsed.ready;
-          }
-          if (parsed.final_prompt && typeof parsed.final_prompt === "string") {
-            finalPrompt = parsed.final_prompt;
-          }
-        } catch (err) {
-          console.error("Erro ao parsear argumentos da ferramenta:", err);
-        }
+    try {
+      const parsed = JSON.parse(rawText);
+      if (typeof parsed.assistant_reply === "string") {
+        assistant_reply = parsed.assistant_reply;
       }
+      if (typeof parsed.ready === "boolean") {
+        ready = parsed.ready;
+      }
+      if (typeof parsed.final_prompt === "string" && parsed.final_prompt.trim().length > 0) {
+        final_prompt = parsed.final_prompt;
+      }
+    } catch (err) {
+      console.error("Falha ao parsear JSON do Gemini em image-chat-assistant:", err, rawText);
+      assistant_reply = rawText ||
+        "Não tenho certeza se entendi. Pode explicar com um pouco mais de detalhe o tipo de imagem que você quer?";
+      ready = false;
+      final_prompt = null;
     }
 
-    if (!assistantText) {
-      assistantText =
+    if (!assistant_reply) {
+      assistant_reply =
         "Não tenho certeza se entendi. Pode explicar com um pouco mais de detalhe o tipo de imagem que você quer?";
     }
 
     // Garante que SEMPRE haja o marcador de modo de interface apenas na primeira resposta
-    if (!assistantText.includes("[UI_MODE:CHAT]") && !hasPreviousAssistantReply) {
-      assistantText = `[UI_MODE:CHAT]\n\n${assistantText}`;
+    if (!assistant_reply.includes("[UI_MODE:CHAT]") && !hasPreviousAssistantReply) {
+      assistant_reply = `[UI_MODE:CHAT]\n\n${assistant_reply}`;
     }
 
     return new Response(
       JSON.stringify({
-        reply: assistantText,
+        reply: assistant_reply,
         ready,
-        finalPrompt,
+        finalPrompt: final_prompt,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
