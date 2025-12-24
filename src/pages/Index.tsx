@@ -609,8 +609,22 @@ const Index = () => {
                   setPrompt("");
                 }}
               >
-                <div className="shrink-0 rounded-full bg-background/40 w-8 h-8 flex items-center justify-center">
-                  <Plus className="w-4 h-4 text-muted-foreground" />
+                <div className="shrink-0 flex items-center justify-center">
+                  <button
+                    type="button"
+                    className="rounded-full bg-background/40 w-8 h-8 flex items-center justify-center"
+                    aria-label="Adicionar arquivo (imagem ou áudio)"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Plus className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,audio/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
                 </div>
                 <Textarea
                   value={prompt}
