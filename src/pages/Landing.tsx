@@ -66,13 +66,6 @@ const Landing = () => {
               Acessar estúdio completo
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => navigate("/app")}
-            >
-              Ver demo rápida
-            </Button>
           </div>
 
           <div className="flex flex-wrap gap-4 pt-4 text-xs text-muted-foreground">
