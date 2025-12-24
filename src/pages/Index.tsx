@@ -393,7 +393,7 @@ const Index = () => {
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.25em] text-muted-foreground/80">
                   Estúdio de Criativos com IA
                 </p>
-                <h1 className="text-lg md:text-2xl font-semibold tracking-tight">
+                <h1 className="text-base sm:text-lg md:text-2xl font-semibold tracking-tight leading-snug">
                   Chat de imagens em tempo real
                 </h1>
               </div>
