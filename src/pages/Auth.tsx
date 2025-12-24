@@ -41,15 +41,27 @@ export default function Auth() {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
+
+        // Garante que o perfil exista/atualize o e-mail
+        if (data.session?.user) {
+          await supabase.from("profiles").upsert(
+            {
+              id: data.session.user.id,
+              email: data.session.user.email ?? email,
+            },
+            { onConflict: "id" }
+          );
+        }
+
         toast.success("Login realizado com sucesso!");
         navigate("/app");
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -57,6 +69,17 @@ export default function Auth() {
           },
         });
         if (error) throw error;
+
+        if (data.session?.user) {
+          await supabase.from("profiles").upsert(
+            {
+              id: data.session.user.id,
+              email: data.session.user.email ?? email,
+            },
+            { onConflict: "id" }
+          );
+        }
+
         toast.success("Conta criada com sucesso!");
         navigate("/app");
       }
