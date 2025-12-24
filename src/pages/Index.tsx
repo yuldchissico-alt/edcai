@@ -672,14 +672,14 @@ const Index = () => {
                         <button
                           type="button"
                           className="rounded-full w-9 h-9 flex items-center justify-center transition-colors bg-muted text-muted-foreground hover:bg-muted/80 disabled:opacity-60"
-                          aria-label="Selecionar arquivo de imagem ou áudio"
+                          aria-label="Selecionar áudio ou imagem"
                           onClick={() => fileInputRef.current?.click()}
                           disabled={processingFile}
                         >
                           {processingFile ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
-                            <Plus className="w-4 h-4" />
+                            <Mic className="w-4 h-4" />
                           )}
                         </button>
                         <input
