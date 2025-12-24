@@ -256,7 +256,7 @@ const Index = () => {
         description: "Criando uma imagem ultra-realista para o seu prompt.",
       });
 
-      const { data, error } = await supabase.functions.invoke("generate-image", {
+      const { data, error } = await supabase.functions.invoke("generate-image-gemini-direct", {
         body: {
           prompt: promptText,
           aspectRatio: imageAspect,
