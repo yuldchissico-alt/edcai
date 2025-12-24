@@ -72,14 +72,16 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-start md:items-center justify-center bg-background px-4 py-8">
-      <Card className="w-full max-w-md p-6 md:p-8 space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md p-8 space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+          <h1 className="text-3xl font-bold text-foreground">
             {isLogin ? "Entrar" : "Criar Conta"}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {isLogin ? "Entre com seu e-mail e senha" : "Crie sua conta para começar"}
+          <p className="text-muted-foreground">
+            {isLogin
+              ? "Entre com seu e-mail e senha"
+              : "Crie sua conta para começar"}
           </p>
         </div>
 
@@ -119,7 +121,9 @@ export default function Auth() {
             className="text-sm text-primary hover:underline"
             disabled={loading}
           >
-            {isLogin ? "Não tem conta? Criar nova conta" : "Já tem conta? Fazer login"}
+            {isLogin
+              ? "Não tem conta? Criar nova conta"
+              : "Já tem conta? Fazer login"}
           </button>
         </div>
       </Card>

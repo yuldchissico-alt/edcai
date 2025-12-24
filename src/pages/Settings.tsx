@@ -16,7 +16,7 @@ const Settings = () => {
   }, []);
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex items-start md:items-center justify-center px-4 py-6 md:py-8">
+    <main className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-8">
       <section className="w-full max-w-4xl space-y-6">
         <header className="flex items-center justify-between gap-4 flex-wrap">
           <div>
@@ -32,7 +32,7 @@ const Settings = () => {
 
         <Card className="bg-card/80 border-border/60 p-4 md:p-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col gap-4">
-            <TabsList className="w-full max-w-sm flex-wrap">
+            <TabsList className="w-full max-w-sm">
               <TabsTrigger value="profile" className="flex-1 text-sm">
                 Perfil
               </TabsTrigger>
