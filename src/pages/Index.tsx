@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { Loader2, Sparkles, Copy, CheckCircle2, Video, Image as ImageIcon, Plus, Mic, LogOut, Images, Clock, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useVoiceRecording } from "@/hooks/useVoiceRecording";
@@ -12,6 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import type { User } from "@supabase/supabase-js";
 import VideoPlayer from "@/components/VideoPlayer";
+
+const DEFAULT_MONTHLY_IMAGE_LIMIT = 50;
+
 interface AdContent {
   hook: string;
   script: {
@@ -56,6 +60,7 @@ const Index = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState<1 | 2 | 3>(1);
+  const [monthlyUsage, setMonthlyUsage] = useState<{ used: number; limit: number } | null>(null);
 
   const showGeminiErrorToast = (err: unknown, context: "image" | "chat") => {
     const anyErr = err as any;
@@ -117,6 +122,33 @@ const Index = () => {
       variant: "destructive",
     });
   };
+
+  const getCurrentMonthPeriodStart = () => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+  };
+
+  const fetchMonthlyUsage = useCallback(
+    async (userId: string) => {
+      const periodStart = getCurrentMonthPeriodStart();
+      const { data, error } = await supabase
+        .from("image_usage_monthly")
+        .select("images_generated, plan_limit")
+        .eq("user_id", userId)
+        .eq("period_start", periodStart)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Erro ao carregar uso mensal de imagens:", error);
+        return;
+      }
+
+      const used = data?.images_generated ?? 0;
+      const limit = data?.plan_limit ?? DEFAULT_MONTHLY_IMAGE_LIMIT;
+      setMonthlyUsage({ used, limit });
+    },
+    [],
+  );
 
   const fetchConversations = useCallback(async (userId: string) => {
     const { data, error } = await supabase
@@ -199,6 +231,7 @@ const Index = () => {
       } else {
         setUser(session.user);
         fetchConversations(session.user.id);
+        fetchMonthlyUsage(session.user.id);
       }
     });
 
@@ -207,6 +240,7 @@ const Index = () => {
         navigate("/auth");
       } else {
         setUser(session.user);
+        fetchMonthlyUsage(session.user.id);
       }
     });
 
@@ -216,7 +250,7 @@ const Index = () => {
     }
 
     return () => subscription.unsubscribe();
-  }, [navigate, fetchConversations]);
+  }, [navigate, fetchConversations, fetchMonthlyUsage]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -316,6 +350,28 @@ const Index = () => {
       return;
     }
 
+    if (!user) {
+      toast({
+        title: "Sessão expirada",
+        description: "Entre novamente para gerar imagens.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const periodStart = getCurrentMonthPeriodStart();
+    let used = monthlyUsage?.used ?? 0;
+    const limit = monthlyUsage?.limit ?? DEFAULT_MONTHLY_IMAGE_LIMIT;
+
+    if (used >= limit) {
+      toast({
+        title: "Limite mensal atingido",
+        description: `Você já gerou ${limit} imagens neste mês. Atualize seu plano para continuar gerando novas imagens.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setGeneratingImage(true);
       toast({
@@ -359,6 +415,25 @@ const Index = () => {
         if (user) {
           await fetchConversations(user.id);
         }
+      }
+
+      // Atualiza uso mensal de imagens
+      used += 1;
+      setMonthlyUsage({ used, limit });
+      const { error: usageError } = await supabase
+        .from("image_usage_monthly")
+        .upsert(
+          {
+            user_id: user.id,
+            period_start: periodStart,
+            images_generated: used,
+            plan_limit: limit,
+          },
+          { onConflict: "user_id,period_start" },
+        );
+
+      if (usageError) {
+        console.error("Erro ao atualizar uso mensal de imagens:", usageError);
       }
 
       // Salvar imagem gerada na galeria do usuário
@@ -595,6 +670,18 @@ const Index = () => {
             </Button>
           </div>
         </div>
+
+        {monthlyUsage && (
+          <div className="w-full max-w-3xl mx-auto mt-3 mb-1 space-y-1">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Uso mensal de imagens</span>
+              <span>
+                {monthlyUsage.used} / {monthlyUsage.limit} imagens
+              </span>
+            </div>
+            <Progress value={(monthlyUsage.used / monthlyUsage.limit) * 100} className="h-2" />
+          </div>
+        )}
 
         <div className="w-full flex flex-col lg:flex-row gap-6 items-center lg:items-start">
           <ConversationsSidebar />

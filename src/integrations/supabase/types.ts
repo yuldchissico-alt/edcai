@@ -73,6 +73,36 @@ export type Database = {
         }
         Relationships: []
       }
+      image_usage_monthly: {
+        Row: {
+          created_at: string
+          id: string
+          images_generated: number
+          period_start: string
+          plan_limit: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          images_generated?: number
+          period_start: string
+          plan_limit?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          images_generated?: number
+          period_start?: string
+          plan_limit?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       photos: {
         Row: {
           created_at: string
