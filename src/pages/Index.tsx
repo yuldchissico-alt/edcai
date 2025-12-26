@@ -37,8 +37,7 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
   const { isRecording, isTranscribing, startRecording, stopRecording } = useVoiceRecording();
-  
-  
+
   const [prompt, setPrompt] = useState("");
   const [loadingAd, setLoadingAd] = useState(false);
   const [generatingVideo, setGeneratingVideo] = useState(false);
@@ -55,6 +54,8 @@ const Index = () => {
   const [isConversationsOpen, setIsConversationsOpen] = useState(true);
   const [processingFile, setProcessingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState<1 | 2 | 3>(1);
 
   const showGeminiErrorToast = (err: unknown, context: "image" | "chat") => {
     const anyErr = err as any;
@@ -209,8 +210,13 @@ const Index = () => {
       }
     });
 
+    const hasSeenOnboarding = window.localStorage.getItem("imageStudioOnboardingSeen");
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    }
+
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, fetchConversations]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -593,10 +599,72 @@ const Index = () => {
         <div className="w-full flex flex-col lg:flex-row gap-6 items-center lg:items-start">
           <ConversationsSidebar />
 
-          <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in">
-{/* layout fixed */}
-             <div className="flex flex-col items-center gap-3 text-center">
+          <div className="flex-1 flex flex-col gap-8 items-center animate-fade-in relative">
+            {showOnboarding && (
+              <div className="absolute inset-0 z-20 flex items-start justify-center bg-background/80 backdrop-blur-sm rounded-3xl border border-border/60 px-4 py-6">
+                <div className="max-w-lg text-center space-y-4">
+                  <p className="text-xs md:text-sm uppercase tracking-[0.25em] text-muted-foreground/80">
+                    Tour rápido do estúdio
+                  </p>
+                  {onboardingStep === 1 && (
+                    <>
+                      <h2 className="text-lg md:text-2xl font-semibold tracking-tight">
+                        1. Escreva ou grave o seu pedido
+                      </h2>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Use o campo principal para descrever quem aparece, o ambiente e o estilo. Se preferir, segure o botão de microfone para ditar o prompt.
+                      </p>
+                    </>
+                  )}
+                  {onboardingStep === 2 && (
+                    <>
+                      <h2 className="text-lg md:text-2xl font-semibold tracking-tight">
+                        2. Use prompts prontos por categoria
+                      </h2>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Logo abaixo você encontra exemplos organizados por tipo de uso (negócios locais, produtos, retratos, lifestyle). Clique em um exemplo para preencher o prompt automaticamente.
+                      </p>
+                    </>
+                  )}
+                  {onboardingStep === 3 && (
+                    <>
+                      <h2 className="text-lg md:text-2xl font-semibold tracking-tight">
+                        3. Combine estilos visuais
+                      </h2>
+                      <p className="text-sm md:text-base text-muted-foreground">
+                        Adicione estilos como "realista", "cinematográfico" ou "editorial" com um clique para deixar a imagem com a cara da sua marca.
+                      </p>
+                    </>
+                  )}
+                  <div className="flex justify-center gap-3 pt-2">
+                    {onboardingStep > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setOnboardingStep((prev) => (prev - 1) as 1 | 2 | 3)}
+                      >
+                        Voltar
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (onboardingStep < 3) {
+                          setOnboardingStep((prev) => (prev + 1) as 1 | 2 | 3);
+                        } else {
+                          window.localStorage.setItem("imageStudioOnboardingSeen", "true");
+                          setShowOnboarding(false);
+                        }
+                      }}
+                    >
+                      {onboardingStep < 3 ? "Próximo" : "Começar a criar"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
 
+            <div className="flex flex-col items-center gap-3 text-center">
               <p className="text-xs md:text-sm uppercase tracking-[0.25em] text-muted-foreground/80">
                 Estúdio de Criativos com IA
               </p>
@@ -702,24 +770,74 @@ const Index = () => {
                     </form>
                   </Card>
 
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground">Exemplos de prompts de imagem:</p>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs text-muted-foreground">Prompts prontos por categoria:</p>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs md:text-sm">
-                      {["Crie a foto de uma mulher mocambicana, 30 anos, cabelo natural preto, sorrindo confiante, em um escritório moderno, iluminação natural, estilo realista, pronta para anúncio em redes sociais.", "Foto de um homem jovem empreendedor, sentado em frente ao notebook em um coworking moderno, estilo lifestyle, luz suave, focado em negócios digitais.", "Imagem de produto cosmético minimalista apoiado em superfície de pedra, fundo desfocado, luz lateral dramática, estilo editorial premium.", "Foto de casal se exercitando ao ar livre ao pôr do sol, clima de conquista e bem-estar, cores quentes, estilo campanha fitness profissional."].map(
-                        (example) => (
+                      {[
+                        {
+                          categoria: "Negócios locais",
+                          prompt:
+                            "Foto realista de dona de pequena pastelaria em Maputo, em pé atrás do balcão, sorrindo, ambiente aconchegante, luz natural entrando pela janela, foco em produtos frescos na frente.",
+                        },
+                        {
+                          categoria: "Produtos / e-commerce",
+                          prompt:
+                            "Imagem de tênis esportivo sobre superfície branca minimalista, sombra suave, fundo desfocado com toque de azul, estilo foto de catálogo premium.",
+                        },
+                        {
+                          categoria: "Retratos profissionais",
+                          prompt:
+                            "Retrato de mulher executiva africana em escritório moderno, fundo desfocado, iluminação de estúdio suave, expressão confiante, estilo foto corporativa LinkedIn.",
+                        },
+                        {
+                          categoria: "Lifestyle / redes sociais",
+                          prompt:
+                            "Foto de grupo de amigos jovens rindo em cafeteria moderna, tons quentes, luz de fim de tarde, estilo lifestyle para feed do Instagram.",
+                        },
+                      ].map((item) => (
+                        <button
+                          key={item.prompt}
+                          type="button"
+                          onClick={() => {
+                            setPrompt(item.prompt);
+                            generateImagesFromPrompt(item.prompt);
+                          }}
+                          className="text-left px-3 py-2 rounded-lg bg-muted/60 hover:bg-muted transition-colors border border-border/40 text-[11px] md:text-xs leading-relaxed"
+                        >
+                          <span className="block text-[10px] font-medium text-primary mb-1 uppercase tracking-[0.15em]">
+                            {item.categoria}
+                          </span>
+                          {item.prompt}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="pt-3 space-y-2">
+                      <p className="text-xs text-muted-foreground">Sugestões de estilos visuais:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          "estilo foto realista, iluminação suave, cores neutras",
+                          "estilo cinematográfico, contraste alto, sombras marcadas",
+                          "estilo editorial de revista, composição minimalista",
+                          "estilo foto de campanha fitness, cores quentes e dinâmicas",
+                          "estilo retrato corporativo, fundo desfocado profissional",
+                        ].map((style) => (
                           <button
-                            key={example}
+                            key={style}
                             type="button"
                             onClick={() => {
-                              setPrompt(example);
-                              generateImagesFromPrompt(example);
+                              setPrompt((prev) =>
+                                prev.includes(style) ? prev : `${prev.trim()}${prev ? ", " : ""}${style}`,
+                              );
                             }}
-                            className="text-left px-3 py-2 rounded-lg bg-muted/60 hover:bg-muted transition-colors border border-border/40 text-[11px] md:text-xs leading-relaxed"
+                            className="px-3 py-1 rounded-full border border-border/50 bg-background/60 text-[11px] md:text-xs text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
                           >
-                            {example}
+                            {style}
                           </button>
-                        ),
-                      )}
+                        ))}
+                      </div>
                     </div>
                   </div>
 
