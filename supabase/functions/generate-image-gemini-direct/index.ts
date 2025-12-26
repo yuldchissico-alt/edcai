@@ -61,7 +61,7 @@ ${prompt}`;
       prompt: basePrompt,
       n: 1,
       size,
-      response_format: "b64_json",
+      // gpt-image-1 já retorna base64 por padrão; não utilizar response_format
     };
 
     const response = await fetch(url, {
