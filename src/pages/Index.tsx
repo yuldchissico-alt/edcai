@@ -61,37 +61,37 @@ const Index = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState<1 | 2 | 3>(1);
   const [monthlyUsage, setMonthlyUsage] = useState<{ used: number; limit: number } | null>(null);
-
-  const showGeminiErrorToast = (err: unknown, context: "image" | "chat") => {
+ 
+  const showImageApiErrorToast = (err: unknown, context: "image" | "chat") => {
     const anyErr = err as any;
-
+ 
     // Tenta extrair status de várias formas (edge function + Supabase + mensagem)
     let status: number | undefined = anyErr?.status ?? anyErr?.cause?.status ?? anyErr?.context?.response?.status;
-
+ 
     const msg: string | undefined =
       typeof anyErr?.message === "string" ? anyErr.message : undefined;
-
+ 
     if (!status && typeof anyErr?.code === "string" && /^\d{3}$/.test(anyErr.code)) {
       status = Number(anyErr.code);
     }
-
+ 
     if (!status && msg) {
       // Procura um código HTTP na mensagem (ex: "Edge function returned 429")
       const match = msg.match(/\b(400|401|403|429|500)\b/);
       if (match) {
         status = Number(match[1]);
-      } else if (msg.includes("Limite de requisições da API Gemini excedido")) {
+      } else if (msg.includes("Limite de requisições da API de imagens foi excedido")) {
         status = 429;
       }
     }
-
+ 
     const title =
       context === "image"
         ? "Erro ao gerar imagens"
         : "Erro ao conversar com a IA de imagem";
-
+ 
     let description: string;
-
+ 
     switch (status) {
       case 400:
         description =
@@ -100,11 +100,11 @@ const Index = () => {
       case 401:
       case 403:
         description =
-          "Chave da API de imagens inválida ou sem permissão. Verifique a configuração da GEMINI_API_KEY.";
+          "Chave da API de imagens inválida ou sem permissão. Verifique a configuração da chave de imagens no backend.";
         break;
       case 429:
         description =
-          "Limite de requisições da API Gemini excedido. Aguarde alguns segundos e tente novamente.";
+          "Limite de requisições da API de imagens excedido. Aguarde alguns segundos e tente novamente. Se o erro persistir, verifique limites da sua conta na API.";
         break;
       case 500:
         description =
@@ -115,7 +115,7 @@ const Index = () => {
           msg ??
           "Ocorreu um erro ao se comunicar com a API de imagens. Tente novamente em alguns instantes.";
     }
-
+ 
     toast({
       title,
       description,
@@ -477,7 +477,7 @@ const Index = () => {
       }
     } catch (err) {
       console.error("Error generating image:", err);
-      showGeminiErrorToast(err, "image");
+      showImageApiErrorToast(err, "image");
     } finally {
       setGeneratingImage(false);
     }
@@ -627,7 +627,7 @@ const Index = () => {
       }
     } catch (err) {
       console.error("Error in image chat:", err);
-      showGeminiErrorToast(err, "chat");
+      showImageApiErrorToast(err, "chat");
     } finally {
       setChatLoading(false);
     }
