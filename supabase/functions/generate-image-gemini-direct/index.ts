@@ -1,3 +1,4 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -12,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, aspectRatio, model } = await req.json();
+    const { prompt, aspectRatio } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -24,15 +25,23 @@ serve(async (req) => {
       );
     }
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY não está configurada");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY não está configurada");
     }
 
-    const resolvedAspect =
-      aspectRatio === "1:1" || aspectRatio === "4:5" || aspectRatio === "9:16"
-        ? aspectRatio
-        : "9:16";
+    // Mapear aspect ratio para os tamanhos suportados pelo gpt-image-1
+    // gpt-image-1 suporta: 1024x1024, 1536x1024, 1024x1536
+    let size = "1024x1536"; // padrão vertical
+    const ratio = typeof aspectRatio === "string" ? aspectRatio : "9:16";
+
+    if (ratio === "1:1") {
+      size = "1024x1024";
+    } else if (ratio === "16:9") {
+      size = "1536x1024";
+    } else if (ratio === "9:16") {
+      size = "1024x1536";
+    }
 
     const basePrompt = `Você é um fotógrafo publicitário profissional.
 Gere uma imagem de marketing ultra-realista com base no prompt abaixo.
@@ -40,31 +49,26 @@ A imagem deve parecer uma foto real (sem desenho ou ilustração).
 Formato: vertical ou quadrado para anúncios em redes sociais.
 Resolução: equivalente a pelo menos 1080p.
 Estilo: fotografia realista, iluminação profissional, tons de pele naturais, proporções corretas.
-Proporção: ${resolvedAspect}.
+Proporção aproximada: ${ratio}.
 
 Prompt do usuário (português, descreva sujeito, cenário, clima):
 ${prompt}`;
 
-    const modelName =
-      typeof model === "string" && model.trim().length > 0
-        ? model
-        : "gemini-2.0-flash";
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`;
+    const url = "https://api.openai.com/v1/images/generations";
 
     const body = {
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: basePrompt }],
-        },
-      ],
+      model: "gpt-image-1",
+      prompt: basePrompt,
+      n: 1,
+      size,
+      response_format: "b64_json",
     };
 
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify(body),
     });
@@ -72,7 +76,7 @@ ${prompt}`;
     if (!response.ok) {
       const errorText = await response.text();
       console.error(
-        "Gemini image API error (generate-image-gemini-direct):",
+        "OpenAI image API error (generate-image-gemini-direct -> gpt-image-1):",
         response.status,
         errorText,
       );
@@ -81,7 +85,7 @@ ${prompt}`;
         return new Response(
           JSON.stringify({
             error:
-              "Limite de requisições da API Gemini excedido. Tente novamente em instantes.",
+              "Limite de requisições da API de imagens foi excedido. Tente novamente em instantes.",
           }),
           {
             status: 429,
@@ -94,7 +98,7 @@ ${prompt}`;
         return new Response(
           JSON.stringify({
             error:
-              "A chave da API Gemini é inválida ou não tem permissão para gerar imagens.",
+              "A chave da API de imagens é inválida ou não tem permissão para gerar imagens.",
           }),
           {
             status: response.status,
@@ -104,7 +108,7 @@ ${prompt}`;
       }
 
       return new Response(
-        JSON.stringify({ error: "Erro ao chamar a API do Gemini" }),
+        JSON.stringify({ error: "Erro ao chamar a API de imagens" }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -113,24 +117,23 @@ ${prompt}`;
     }
 
     const data = await response.json();
-    console.log("Gemini image response (generate-image-gemini-direct):", data);
+    console.log(
+      "OpenAI image response (generate-image-gemini-direct -> gpt-image-1):",
+      data,
+    );
 
-    const inlinePart =
-      data?.candidates?.[0]?.content?.parts?.find(
-        (p: any) => p.inlineData && p.inlineData.data,
-      );
+    const first = data?.data?.[0];
+    const base64Data = first?.b64_json as string | undefined;
 
-    const inlineData = inlinePart?.inlineData;
-
-    if (!inlineData?.data) {
+    if (!base64Data) {
       console.error(
-        "Nenhuma imagem inlineData retornada pelo Gemini:",
+        "Nenhuma imagem base64 retornada pela API de imagens:",
         JSON.stringify(data),
       );
       return new Response(
         JSON.stringify({
           error:
-            "A API do Gemini não retornou dados de imagem. Verifique se o modelo suporta geração de imagem.",
+            "A API de imagens não retornou dados de imagem. Verifique se o modelo suporta geração de imagem.",
         }),
         {
           status: 500,
@@ -139,9 +142,7 @@ ${prompt}`;
       );
     }
 
-    const mimeType = inlineData.mimeType || "image/png";
-    const base64Data = inlineData.data as string;
-
+    const mimeType = "image/png";
     const imageDataUrl = `data:${mimeType};base64,${base64Data}`;
 
     return new Response(
@@ -152,13 +153,13 @@ ${prompt}`;
       },
     );
   } catch (error) {
-    console.error("Erro em generate-image-gemini-direct:", error);
+    console.error("Erro em generate-image-gemini-direct (gpt-image-1):", error);
     return new Response(
       JSON.stringify({
         error:
           error instanceof Error
             ? error.message
-            : "Erro desconhecido ao gerar imagem com Gemini",
+            : "Erro desconhecido ao gerar imagem com a API de imagens",
       }),
       {
         status: 500,
