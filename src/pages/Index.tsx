@@ -380,7 +380,7 @@ const Index = () => {
       });
 
       const { data, error } = await supabase.functions.invoke(
-        "generate-image-gemini-direct",
+        "generate-image-openrouter",
         {
           body: {
             prompt: promptText,
@@ -397,9 +397,9 @@ const Index = () => {
 
       if (status === 429) {
         toast({
-          title: "Limite da API do Google Gemini",
+          title: "Limite da API de imagens",
           description:
-            "Você atingiu o limite de requisições do Gemini. Tente novamente em alguns minutos.",
+            "Você atingiu o limite de requisições da API. Tente novamente em alguns minutos.",
           variant: "destructive",
         });
         return;
@@ -407,7 +407,7 @@ const Index = () => {
 
       if (status && status >= 400) {
         toast({
-          title: "Erro na API do Google Gemini",
+          title: "Erro na API de imagens",
           description: geminiErrorMessage,
           variant: "destructive",
         });
@@ -626,7 +626,7 @@ const Index = () => {
         content: messageContent,
       });
 
-      const { data, error } = await supabase.functions.invoke("image-chat-assistant", {
+      const { data, error } = await supabase.functions.invoke("chat-assistant-openrouter", {
         body: {
           messages: newMessages,
         },

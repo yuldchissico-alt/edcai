@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.generate-image-gemini-direct]
 verify_jwt = false
+
+[functions.chat-assistant-openrouter]
+verify_jwt = false
+
+[functions.generate-image-openrouter]
+verify_jwt = false
