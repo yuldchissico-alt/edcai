@@ -52,7 +52,7 @@ Prompt do usuário (português, descreva sujeito, cenário, clima):
 ${prompt}`;
 
     const url =
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=" +
       encodeURIComponent(GEMINI_API_KEY);
 
     const body = {
@@ -65,8 +65,12 @@ ${prompt}`;
           ],
         },
       ],
-      // Pedimos imagem + texto; o modelo retorna a imagem em base64 em uma parte específica
-      // dependendo da configuração do projeto na Google AI. Aqui assumimos o formato padrão.
+      generationConfig: {
+        responseModalities: ["IMAGE"],
+        imageConfig: {
+          aspectRatio: ratio,
+        },
+      },
     } as unknown as Record<string, unknown>;
 
     const response = await fetch(url, {
