@@ -379,15 +379,53 @@ const Index = () => {
         description: "Criando uma imagem ultra-realista para o seu prompt.",
       });
 
-      const { data, error } = await supabase.functions.invoke("generate-image-gemini-direct", {
-        body: {
-          prompt: promptText,
-          aspectRatio: imageAspect,
+      const { data, error } = await supabase.functions.invoke(
+        "generate-image-gemini-direct",
+        {
+          body: {
+            prompt: promptText,
+            aspectRatio: imageAspect,
+          },
         },
-      });
+      );
 
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      const geminiErrorMessage =
+        (data as any)?.error || (error as any)?.message || "Erro ao gerar imagem";
+      const status = (error as any)?.context?.response?.status as
+        | number
+        | undefined;
+
+      if (status === 429) {
+        toast({
+          title: "Limite da API do Google Gemini",
+          description:
+            "Você atingiu o limite de requisições do Gemini. Tente novamente em alguns minutos.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (status && status >= 400) {
+        toast({
+          title: "Erro na API do Google Gemini",
+          description: geminiErrorMessage,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data?.error) {
+        toast({
+          title: "Erro ao gerar imagem",
+          description: data.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (error) {
+        throw error;
+      }
 
       const imageUrl = data.image as string;
 
