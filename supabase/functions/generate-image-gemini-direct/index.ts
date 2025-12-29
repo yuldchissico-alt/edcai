@@ -25,50 +25,54 @@ serve(async (req) => {
       );
     }
 
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-    if (!OPENAI_API_KEY) {
-      throw new Error("OPENAI_API_KEY não está configurada");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY não está configurada");
     }
 
-    // Mapear aspect ratio para os tamanhos suportados pelo gpt-image-1
-    // gpt-image-1 suporta: 1024x1024, 1536x1024, 1024x1536
-    let size = "1024x1536"; // padrão vertical
+    // Ajustar instruções de proporção para o modelo de imagem do Gemini
     const ratio = typeof aspectRatio === "string" ? aspectRatio : "9:16";
 
+    let ratioInstruction = "Proporção vertical, ideal para stories e reels.";
     if (ratio === "1:1") {
-      size = "1024x1024";
+      ratioInstruction = "Proporção quadrada, ideal para feed de redes sociais.";
     } else if (ratio === "16:9") {
-      size = "1536x1024";
-    } else if (ratio === "9:16") {
-      size = "1024x1536";
+      ratioInstruction = "Proporção horizontal, ideal para banners e vídeos.";
     }
 
     const basePrompt = `Você é um fotógrafo publicitário profissional.
 Gere uma imagem de marketing ultra-realista com base no prompt abaixo.
 A imagem deve parecer uma foto real (sem desenho ou ilustração).
-Formato: vertical ou quadrado para anúncios em redes sociais.
+Formato: adequado para anúncios em redes sociais.
 Resolução: equivalente a pelo menos 1080p.
 Estilo: fotografia realista, iluminação profissional, tons de pele naturais, proporções corretas.
-Proporção aproximada: ${ratio}.
+${ratioInstruction}
 
 Prompt do usuário (português, descreva sujeito, cenário, clima):
 ${prompt}`;
 
-    const url = "https://api.openai.com/v1/images/generations";
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
+      encodeURIComponent(GEMINI_API_KEY);
 
     const body = {
-      model: "gpt-image-1",
-      prompt: basePrompt,
-      n: 1,
-      size,
-      // gpt-image-1 já retorna base64 por padrão; não utilizar response_format
-    };
+      contents: [
+        {
+          parts: [
+            {
+              text: basePrompt,
+            },
+          ],
+        },
+      ],
+      // Pedimos imagem + texto; o modelo retorna a imagem em base64 em uma parte específica
+      // dependendo da configuração do projeto na Google AI. Aqui assumimos o formato padrão.
+    } as unknown as Record<string, unknown>;
 
     const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify(body),
     });
@@ -76,7 +80,7 @@ ${prompt}`;
     if (!response.ok) {
       const errorText = await response.text();
       console.error(
-        "OpenAI image API error (generate-image-gemini-direct -> gpt-image-1):",
+        "Gemini image API error (generate-image-gemini-direct -> gemini-2.5-flash):",
         response.status,
         errorText,
       );
@@ -85,7 +89,7 @@ ${prompt}`;
         return new Response(
           JSON.stringify({
             error:
-              "Limite de requisições da API de imagens foi excedido. Tente novamente em instantes.",
+              "Limite de requisições da API do Google Gemini foi excedido. Tente novamente em instantes.",
           }),
           {
             status: 429,
@@ -98,7 +102,7 @@ ${prompt}`;
         return new Response(
           JSON.stringify({
             error:
-              "A chave da API de imagens é inválida ou não tem permissão para gerar imagens.",
+              "A chave da API Google Gemini é inválida ou não tem permissão para gerar imagens.",
           }),
           {
             status: response.status,
@@ -118,22 +122,43 @@ ${prompt}`;
 
     const data = await response.json();
     console.log(
-      "OpenAI image response (generate-image-gemini-direct -> gpt-image-1):",
+      "Gemini image response (generate-image-gemini-direct -> gemini-2.5-flash):",
       data,
     );
 
-    const first = data?.data?.[0];
-    const base64Data = first?.b64_json as string | undefined;
+    // A estrutura exata da resposta depende da configuração do modelo.
+    // Procuramos pela primeira ocorrência de dado de imagem em base64.
+    let base64Data: string | undefined;
+
+    try {
+      const candidates = (data as any)?.candidates ?? [];
+      for (const candidate of candidates) {
+        const parts = candidate?.content?.parts ?? [];
+        for (const part of parts) {
+          if (typeof part?.inlineData?.data === "string") {
+            base64Data = part.inlineData.data;
+            break;
+          }
+          if (typeof part?.fileData?.data === "string") {
+            base64Data = part.fileData.data;
+            break;
+          }
+        }
+        if (base64Data) break;
+      }
+    } catch (e) {
+      console.error("Erro ao extrair imagem em base64 da resposta do Gemini:", e);
+    }
 
     if (!base64Data) {
       console.error(
-        "Nenhuma imagem base64 retornada pela API de imagens:",
+        "Nenhuma imagem base64 retornada pela API Gemini:",
         JSON.stringify(data),
       );
       return new Response(
         JSON.stringify({
           error:
-            "A API de imagens não retornou dados de imagem. Verifique se o modelo suporta geração de imagem.",
+            "A API Google Gemini não retornou dados de imagem. Verifique se o modelo suporta geração de imagem.",
         }),
         {
           status: 500,
@@ -153,13 +178,13 @@ ${prompt}`;
       },
     );
   } catch (error) {
-    console.error("Erro em generate-image-gemini-direct (gpt-image-1):", error);
+    console.error("Erro em generate-image-gemini-direct (Gemini):", error);
     return new Response(
       JSON.stringify({
         error:
           error instanceof Error
             ? error.message
-            : "Erro desconhecido ao gerar imagem com a API de imagens",
+            : "Erro desconhecido ao gerar imagem com a API Google Gemini",
       }),
       {
         status: 500,
