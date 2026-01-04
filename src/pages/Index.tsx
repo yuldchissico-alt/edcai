@@ -798,7 +798,11 @@ const Index = () => {
               </h1>
             </div>
 
-            <Tabs defaultValue="dashboard" className="flex-1 flex flex-col w-full mt-2">
+            <Tabs
+              value={uiMode === "CHAT" ? "chat" : "dashboard"}
+              onValueChange={(value) => setUiMode(value === "chat" ? "CHAT" : "DASHBOARD")}
+              className="flex-1 flex flex-col w-full mt-2"
+            >
 
               <TabsContent value="dashboard" className="flex-1 w-full">
                 <div className="w-full max-w-3xl mx-auto space-y-8 mt-4">
