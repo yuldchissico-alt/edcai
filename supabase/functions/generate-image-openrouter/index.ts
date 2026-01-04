@@ -40,6 +40,8 @@ serve(async (req) => {
         headers: {
           "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
+          "HTTP-Referer": "https://rsgaquaewdijowneztwq.supabase.co/functions/v1/generate-image-openrouter",
+          "X-Title": "Lovable Image Generator",
         },
         body: JSON.stringify({
           model: "sourceful/riverflow-v2-standard-preview",
