@@ -61,7 +61,7 @@ Otherwise just chat normally to refine the prompt.`;
           "X-Title": "Lovable Image Assistant",
         },
         body: JSON.stringify({
-          model: "nvidia/nemotron-nano-12b-v2-vl:free",
+          model: "openai/gpt-4o-mini",
           messages: [
             { role: "system", content: systemPrompt },
             ...messages,
