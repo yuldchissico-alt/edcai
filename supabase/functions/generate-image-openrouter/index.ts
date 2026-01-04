@@ -20,29 +20,29 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-
-    if (!LOVABLE_API_KEY) {
-      console.error("LOVABLE_API_KEY não está configurada");
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
+ 
+    if (!OPENROUTER_API_KEY) {
+      console.error("OPENROUTER_API_KEY não está configurada");
       return new Response(
-        JSON.stringify({ error: "Chave da API Lovable não configurada" }),
+        JSON.stringify({ error: "Chave da API OpenRouter não configurada" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-
+ 
     console.log(`[generate-image-openrouter] Gerando imagem com prompt: "${prompt.substring(0, 50)}..."`);
-
-    // Usar Lovable AI (Nano banana) para gerar imagem
+ 
+    // Usar OpenRouter para gerar imagem com modelo sourceful/riverflow-v2-standard-preview
     const imageResponse = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash-image",
+          model: "sourceful/riverflow-v2-standard-preview",
           messages: [
             {
               role: "user",
